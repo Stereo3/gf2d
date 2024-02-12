@@ -104,5 +104,6 @@ void player_free(Player *self)
     slog("exsists?: %i | Player Freed", thePlayer.exsits);
 }
 
+//There is probably a better way to do all this, but it makes sense to me so who cares?
 
 /*eol@eof*/
