@@ -4,10 +4,9 @@
 
 World *world_test_new()
 {
-    World *world;
-
-    int i,j;
+    int i;
     int width = 75, height = 45;
+    World *world;
 
     world = world_new(width, height);
 
@@ -23,12 +22,12 @@ World *world_test_new()
     for(i = 0; i < width; i++)
     {
         world->tileMap[i] = 1;
-        world->tileMap[i+((height -1)*width)] = 1;
+        world->tileMap[i + ((height - 1) * width)] = 1;
     }    
     for(i = 0; i < height; i++)
     {
-        world->tileMap[i*width] = 1;
-        world->tileMap[i*width + (width-1)] = 1;
+        world->tileMap[i * width] = 1;
+        world->tileMap[i * width + (width - 1)] = 1;
     }
     return world;
 }
@@ -75,9 +74,9 @@ void world_draw(World *world)
     if(!world)return;
     gf2d_sprite_draw_image(world->background,vector2d(0,0));
     if(!world->tileSet)return;
-    for(j=0;j<world->tileHeight;j++)
+    for(j=0;j < world->tileHeight;j++)
     {
-        for(i=0;j<world->tileWidth;i++)
+        for(i=0;i < world->tileWidth;i++)
         {
             index = i + (j*world->tileWidth);
             if(world->tileMap[index] == 0)continue;

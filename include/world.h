@@ -13,6 +13,7 @@ typedef struct
 
 }World;
 
+World *world_test_new();
 
 World *world_new(Uint32 width, Uint32 height);
 
