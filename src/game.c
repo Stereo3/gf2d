@@ -5,6 +5,7 @@
 #include "gf2d_sprite.h"
 #include "entity.h"
 #include "player.h"
+#include "world.h"
 
 
 //This is the beginning of something (hopefully) awesome
