@@ -23,7 +23,7 @@ int main(int argc, char * argv[])
     Player *player;
     World *world;
     
-    
+    //backup
     /*program initializtion*/
     init_logger("gf2d.log",0);
     slog("---==== BEGIN ====---");
