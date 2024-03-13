@@ -1,5 +1,7 @@
 #include "player.h"
 #include "simple_logger.h"
+#include "camera.h"
+
 
 static Player thePlayer = {0};
 
@@ -32,7 +34,7 @@ Player *player_new(const char *thePlayerName)
     player->isPlayer = 1;
     player->entityName = thePlayerName;
 
-    slog("The Players Chosen Name: %s", thePlayerName);
+    slog("The Players Chosen Name: %s \n", thePlayerName);
 
     thePlayer.player = player;
     thePlayer.playerName = thePlayerName;
@@ -94,6 +96,8 @@ void player_update(Player *self)
     self->player->frame += 0.1;
     //slog("Frame: %f", self->player->frame);
     if(self->player->frame >= 9)self->player->frame = 0;
+
+    camera_center_on(self->player->position);
 }
 void player_free(Player *self)
 {
