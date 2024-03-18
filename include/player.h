@@ -8,7 +8,7 @@ typedef struct Player_S
     Uint8 exsits;
     Entity *player;
     const char *playerName;
-    float playerSpeed;
+    float playerSpeed, movementBudget_x, movementBudget_y;
 }Player;
 
 void player_think(Player *self);

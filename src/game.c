@@ -9,6 +9,7 @@
 #include "entity.h"
 #include "player.h"
 #include "world.h"
+#include "enemy.h"
 
 int main(int argc, char * argv[])
 {
@@ -22,7 +23,8 @@ int main(int argc, char * argv[])
     Sprite *mouse;
     Color mouseColor = gfc_color8(255,100,255,200);
     Player *player;
-    TextLine fps;
+    Entity *pirateShip1;
+    TextLine fps, player_pos, movementBudgets;
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -46,6 +48,7 @@ int main(int argc, char * argv[])
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new("greg");
     world = world_load("maps/testworld.map");
+    pirateShip1 = enemy_new(vector2d(96,96));
     world_setup_camera(world);
     /*main game loop*/
     while(!done)
@@ -70,10 +73,16 @@ int main(int argc, char * argv[])
         
             entity_draw_all();
             
-            font_draw_text("Press ESC to quit",FS_small, GFC_COLOR_CYAN,vector2d(10,10));
-            gfc_line_sprintf(fps,"FPS: %f",gf2d_graphics_get_frames_per_second());
-            font_draw_text(fps,FS_small,GFC_COLOR_GREEN,vector2d(10,35));
-
+            if(keys[SDL_SCANCODE_TAB])
+            {
+                gfc_line_sprintf(player_pos,"Players Position| X: %f, Y: %f", player->player->position.x, player->player->position.y);
+                font_draw_text(player_pos,FS_small, GFC_COLOR_CYAN,vector2d(10,10));
+                gfc_line_sprintf(fps,"FPS: %f",gf2d_graphics_get_frames_per_second());
+                font_draw_text(fps,FS_small,GFC_COLOR_GREEN,vector2d(10,40));
+                gfc_line_sprintf(movementBudgets,"Movement Budgets | X: %f, Y: %f",player->movementBudget_x, player->movementBudget_y);
+                font_draw_text(movementBudgets,FS_small,GFC_COLOR_RED,vector2d(10,70));
+            }
+            
             //UI elements last
             gf2d_sprite_draw(
                 mouse,

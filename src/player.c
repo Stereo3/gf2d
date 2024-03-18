@@ -5,6 +5,8 @@
 
 static Player thePlayer = {0};
 
+SDL_Event event;
+
 Player *player_new(const char *thePlayerName)
 {
     //slog("exsists?: %i", thePlayer.exsits);
@@ -29,8 +31,8 @@ Player *player_new(const char *thePlayerName)
     }
 
     player->sprite = gf2d_sprite_load_all("images/skelebones.png",64,64,9,0);
-    player->frame = 0;
-    player->position = vector2d(0,0);
+    player->frame = 19;
+    player->position = vector2d(64,64);
     player->isPlayer = 1;
     player->entityName = thePlayerName;
 
@@ -38,7 +40,9 @@ Player *player_new(const char *thePlayerName)
 
     thePlayer.player = player;
     thePlayer.playerName = thePlayerName;
-    thePlayer.playerSpeed = 2.5;
+    thePlayer.playerSpeed = 2;
+    thePlayer.movementBudget_x = 128;
+    thePlayer.movementBudget_y = 128;
 
     return &thePlayer;
 }
@@ -55,26 +59,71 @@ void player_think(Player *self)
     left = vector2d(-self->playerSpeed,0);
     right = vector2d(self->playerSpeed,0);
 
-    if (keys[SDL_SCANCODE_W])
+    SDL_PollEvent(&event);
+/* 
+    switch(event.type)
     {
-        //vector3d_add(self->position,self->position,forward);
-        vector2d_add(self->player->position,self->player->position,up);
+        case SDL_KEYDOWN:
+            switch(event.key.keysym.sym)
+            {
+                case SDLK_w:
+                    //slog("i pressed w");
+                    self->player->position.y -= 64;
+                    break;
+                case SDLK_a:
+                    self->player->position.x -= 64;
+                    break;
+                case SDLK_s:
+                    self->player->position.y += 64;
+                    break;
+                case SDLK_d:
+                    self->player->position.x += 64;
+                    break;
+
+            }
     }
-    if (keys[SDL_SCANCODE_S])
+ */
+    switch(event.type)
     {
-        //vector3d_add(self->position,self->position,-forward);
-        vector2d_add(self->player->position,self->player->position,down);
+        case SDL_KEYDOWN:
+            switch(event.key.keysym.sym)
+            {
+                case SDLK_k:
+                    self->movementBudget_x = 128;
+                    self->movementBudget_y = 128;
+                    break;
+            }
+            break;
     }
-    if (keys[SDL_SCANCODE_D])
+
+    if(self->movementBudget_x > 0 || self->movementBudget_y > 0)
     {
-        //vector3d_add(self->position,self->position,right);
-        vector2d_add(self->player->position,self->player->position,right);
+        if (keys[SDL_SCANCODE_W] && self->movementBudget_x > 0)
+        {
+            //vector3d_add(self->position,self->position,forward);
+            vector2d_add(self->player->position,self->player->position,up);
+            self->movementBudget_x -= 1;
+        }
+        if (keys[SDL_SCANCODE_S] && self->movementBudget_x > 0)
+        {
+            //vector3d_add(self->position,self->position,-forward);
+            vector2d_add(self->player->position,self->player->position,down);
+            self->movementBudget_x -= 1;
+        }
+        if (keys[SDL_SCANCODE_D] && self->movementBudget_y > 0)
+        {
+            //vector3d_add(self->position,self->position,right);
+            vector2d_add(self->player->position,self->player->position,right);
+            self->movementBudget_y -= 1;
+        }
+        if (keys[SDL_SCANCODE_A] && self->movementBudget_y > 0)
+        {
+            //vector3d_add(self->position,self->position,-right);
+            vector2d_add(self->player->position,self->player->position,left);
+            self->movementBudget_y -= 1;
+        }
     }
-    if (keys[SDL_SCANCODE_A])
-    {
-        //vector3d_add(self->position,self->position,-right);
-        vector2d_add(self->player->position,self->player->position,left);
-    }
+    
     if(keys[SDL_SCANCODE_N])
     {
         Entity *temp_ent;
@@ -95,7 +144,11 @@ void player_update(Player *self)
     if(!self)return;
     self->player->frame += 0.1;
     //slog("Frame: %f", self->player->frame);
-    if(self->player->frame >= 9)self->player->frame = 0;
+    if(self->player->frame >= 27)self->player->frame = 19;
+    if(self->player->position.x <= 48)self->player->position.x = 48;
+    if(self->player->position.x >= 1090)self->player->position.x = 1090;
+    if(self->player->position.y <= 48)self->player->position.y = 48;
+    if(self->player->position.y >= 592)self->player->position.y = 592;
 
     camera_center_on(self->player->position);
 }

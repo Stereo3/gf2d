@@ -144,7 +144,7 @@ World *world_load(const char *filename)
     sj_free(json);
     return world;
 }
-
+/* 
 World *world_test_new()
 {
     int i;
@@ -157,9 +157,9 @@ World *world_test_new()
     
     world->background = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
     world->tileSet = gf2d_sprite_load_all(
-        "images/backgrounds/tileset.png",
-        16,
-        16,
+        "images/backgrounds/tileset2.png",
+        64,
+        64,
         1,
         1);
     for (i = 0; i < width;i++)
@@ -175,6 +175,7 @@ World *world_test_new()
     world_tile_layer_build(world);
     return world;
 }
+ */
 
 World *world_new(Uint32 width, Uint32 height)
 {
