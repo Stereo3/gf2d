@@ -7,10 +7,11 @@ typedef struct Player_S
 {
     Uint8 exsits, inCombat, movementEnabled;
     Entity *player;
+    Entity *enemyInCombatWith;
     const char *playerName;
     float playerSpeed, movementBudget_x, movementBudget_y;
     Vector2D lastLocation;
-    int gold, damage;
+    int gold;
 }Player;
 
 void player_think(Player *self);

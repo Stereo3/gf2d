@@ -7,6 +7,8 @@
         "world.h": "c",
         "entity.h": "c",
         "gfc_primitives.h": "c",
-        "simple_logger.h": "c"
+        "simple_logger.h": "c",
+        "sdl.h": "c",
+        "time.h": "c"
     }
 }

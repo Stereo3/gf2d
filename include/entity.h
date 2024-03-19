@@ -17,6 +17,7 @@ typedef struct Entity_S
     Uint8 selected;
     Uint8 isPlayer;
     Uint8 isEnemy;
+    Uint8 hasAttacked;
     float frame;
     Circle bounds;
 
@@ -30,7 +31,7 @@ typedef struct Entity_S
 
     void *customData;
 
-    int health;
+    int health, healthPool;
 
 }Entity;
 
@@ -99,9 +100,12 @@ Entity *entity_get_collision_partner(Entity *self);
 
 Uint8 bad_collision_check(Entity *self, Entity *other);
 
+int rng_machine(int lower, int upper, int count); 
+
 
 
 
 //Entity Class derived from my 3D game code, originally found here: https://github.com/engineerOfLies/gf3d/blob/main/include/entity.h
+//rng_machine modified from: https://www.geeksforgeeks.org/generating-random-number-range-c/ 
 //My (arguably worse) version found here: https://github.com/Stereo3/IT485-DayTar/blob/main/include/entity.h     
 #endif

@@ -15,4 +15,6 @@ void enemy_die(Entity *self);
 
  Entity *enemy_new(Vector2D enemyPosition);
 
+ void enemy_attack(Entity *target);
+
 #endif

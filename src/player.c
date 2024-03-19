@@ -1,8 +1,8 @@
-#include "player.h"
 #include "simple_logger.h"
+#include "player.h"
 #include "camera.h"
 
-Entity *collisionPartner, *enemyInCombatWith;
+Entity *collisionPartner;
 
 static Player thePlayer = {0};
 
@@ -48,12 +48,13 @@ Player *player_new(const char *thePlayerName)
     thePlayer.movementBudget_y = 128;
     thePlayer.inCombat = 0;
     thePlayer.movementEnabled = 1;
-    thePlayer.damage = 25;
 
     thePlayer.player->bounds.x = thePlayer.player->position.x;
     thePlayer.player->bounds.y = thePlayer.player->position.y;
     thePlayer.player->bounds.r = 64;
     thePlayer.player->health = 100;
+    thePlayer.player->healthPool = thePlayer.player->health;
+    thePlayer.player->hasAttacked = 0;
 
     //slog("Player Bounds Values: X:%f Y:%f R:%f", thePlayer.player->bounds.x,thePlayer.player->bounds.y,thePlayer.player->bounds.r);
 
@@ -62,9 +63,10 @@ Player *player_new(const char *thePlayerName)
 
 void player_attack(Entity *target)
 {
-    slog("Smack");
-    target->health -= thePlayer.damage;
-    slog("Enemy health: %i", target->health);
+    //slog("Smack");
+    target->health -= rng_machine(1,15,1);
+    thePlayer.player->hasAttacked = 1;
+    //slog("Enemy health: %i", target->health);
 }
 
 void player_think(Player *self)
@@ -174,13 +176,13 @@ void player_think(Player *self)
             //slog("1 Enemey Position: X:%f | Y:%f", collisionPartner->position.x, collisionPartner->position.y);
             self->player->position = vector2d(256,300);
             collisionPartner->position = vector2d(600,150);
-            enemyInCombatWith = collisionPartner;
+            self->enemyInCombatWith = collisionPartner;
             self->inCombat = 1;
         }
     }
     
 
-    if(enemyInCombatWith != NULL)
+    if(self->enemyInCombatWith != NULL)
     { 
         if(self->inCombat == 1)
         {
@@ -193,7 +195,7 @@ void player_think(Player *self)
                     switch(event.key.keysym.sym)
                     {
                         case SDLK_o:
-                            player_attack(enemyInCombatWith);
+                            player_attack(self->enemyInCombatWith);
                             break;
                     }
                     break;
@@ -243,6 +245,6 @@ Player *player_get_player()
 
 
 
-//Made for push
+
 
 /*eol@eof*/

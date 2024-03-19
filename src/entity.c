@@ -1,3 +1,6 @@
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <time.h> 
 #include "entity.h"
 
 typedef struct
@@ -201,6 +204,18 @@ Entity *entity_get_collision_partner(Entity *self){
 
     }
     return NULL;
+}
+
+int rng_machine(int lower, int upper, int count)
+{
+    int i;
+    srand(time(0)); 
+    for (i = 0; i < count; i++) { 
+        int num = (rand() % 
+        (upper - lower + 1)) + lower; 
+        //slog("RNG: %i", num);
+        return num; 
+    } 
 }
 
 /* Uint8 bad_collision_check(Entity *self, Entity *other)

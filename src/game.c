@@ -27,7 +27,8 @@ int main(int argc, char * argv[])
     Color mouseColor = gfc_color8(255,100,255,200);
     Player *player;
     Entity *pirateShip1;
-    TextLine fps, player_pos, movementBudgets, combatStatus;
+    TextLine fps, player_pos, movementBudgets, combatStatus, 
+    enemyHealth, playerHealth;
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -103,6 +104,10 @@ int main(int argc, char * argv[])
                 if(player->inCombat == 1)
                 {
                     world_draw(combat);
+                    gfc_line_sprintf(enemyHealth,"%i/%i",player->enemyInCombatWith->health,player->enemyInCombatWith->healthPool);
+                    font_draw_text(enemyHealth,FS_large,GFC_COLOR_RED,vector2d(625,350));
+                    gfc_line_sprintf(playerHealth,"%i/%i",player->player->health,player->player->healthPool);
+                    font_draw_text(playerHealth,FS_large,GFC_COLOR_GREEN,vector2d(256,350));
                 }
                 else
                 {
