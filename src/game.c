@@ -17,6 +17,9 @@ int main(int argc, char * argv[])
     int done = 0;
     const Uint8 * keys;
     World *world;
+    World *combat;
+    Uint8 mainMenuBool = 1;
+    Sprite *mainMenuImg;
     
     int mx,my;
     float mf = 0;
@@ -24,7 +27,7 @@ int main(int argc, char * argv[])
     Color mouseColor = gfc_color8(255,100,255,200);
     Player *player;
     Entity *pirateShip1;
-    TextLine fps, player_pos, movementBudgets;
+    TextLine fps, player_pos, movementBudgets, combatStatus;
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -48,7 +51,9 @@ int main(int argc, char * argv[])
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new("greg");
     world = world_load("maps/testworld.map");
-    pirateShip1 = enemy_new(vector2d(96,96));
+    combat = world_load("maps/combat.map");
+    pirateShip1 = enemy_new(vector2d(320,320));
+    mainMenuImg = gf2d_sprite_load_all("images/mainmenu.png",125,300,1,0);
     world_setup_camera(world);
     /*main game loop*/
     while(!done)
@@ -61,46 +66,87 @@ int main(int argc, char * argv[])
         mf+=0.1;
         if (mf >= 16.0)mf = 0;
         
-        entity_think_all();
-        entity_update_all();
-        player_think(player);
-        player_update(player);
-        
-        gf2d_graphics_clear_screen();// clears drawing buffers
-        // all drawing should happen betweem clear_screen and next_frame
-            //backgrounds drawn first            
-            world_draw(world);
-        
-            entity_draw_all();
+        if(mainMenuBool == 1)
+        {
             
-            if(keys[SDL_SCANCODE_TAB])
+            if(!mainMenuImg)
             {
-                gfc_line_sprintf(player_pos,"Players Position| X: %f, Y: %f", player->player->position.x, player->player->position.y);
-                font_draw_text(player_pos,FS_small, GFC_COLOR_CYAN,vector2d(10,10));
-                gfc_line_sprintf(fps,"FPS: %f",gf2d_graphics_get_frames_per_second());
-                font_draw_text(fps,FS_small,GFC_COLOR_GREEN,vector2d(10,40));
-                gfc_line_sprintf(movementBudgets,"Movement Budgets | X: %f, Y: %f",player->movementBudget_x, player->movementBudget_y);
-                font_draw_text(movementBudgets,FS_small,GFC_COLOR_RED,vector2d(10,70));
+                return NULL;
             }
-            
-            //UI elements last
-            gf2d_sprite_draw(
-                mouse,
-                vector2d(mx,my),
-                NULL,
-                NULL,
-                NULL,
-                NULL,
-                &mouseColor,
-                (int)mf);
+            gf2d_graphics_clear_screen();
 
-        gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
+            gf2d_sprite_draw_image(mainMenuImg,vector2d(500,100));
+
+            gf2d_graphics_next_frame();
+        
+            if (keys[SDL_SCANCODE_3])
+            {
+                done = 1;
+            }
+            else if(keys[SDL_SCANCODE_1])
+            {
+                mainMenuBool = 0;
+            } 
+        }
+        else
+        {
+            entity_think_all();
+            entity_update_all();
+            player_think(player);
+            player_update(player);
+            enemy_think(pirateShip1);
+            enemy_update(pirateShip1);
+            
+            gf2d_graphics_clear_screen();// clears drawing buffers
+            // all drawing should happen betweem clear_screen and next_frame
+                //backgrounds drawn first            
+                if(player->inCombat == 1)
+                {
+                    world_draw(combat);
+                }
+                else
+                {
+                    world_draw(world);
+                }
+                //slog("Player in Combat: %i", player->inCombat);
+            
+                entity_draw_all();
+                
+                if(keys[SDL_SCANCODE_TAB])
+                {
+                    gfc_line_sprintf(player_pos,"Players Position| X: %f, Y: %f", player->player->position.x, player->player->position.y);
+                    font_draw_text(player_pos,FS_small, GFC_COLOR_CYAN,vector2d(10,10));
+                    gfc_line_sprintf(fps,"FPS: %f",gf2d_graphics_get_frames_per_second());
+                    font_draw_text(fps,FS_small,GFC_COLOR_GREEN,vector2d(10,40));
+                    gfc_line_sprintf(movementBudgets,"Movement Budgets | X: %f, Y: %f",player->movementBudget_x, player->movementBudget_y);
+                    font_draw_text(movementBudgets,FS_small,GFC_COLOR_RED,vector2d(10,70));
+                    gfc_line_sprintf(combatStatus,"Combat Status: %i",player->inCombat);
+                    font_draw_text(combatStatus,FS_small,GFC_COLOR_ORANGE,vector2d(10,100));
+
+                }
+                
+                //UI elements last
+                gf2d_sprite_draw(
+                    mouse,
+                    vector2d(mx,my),
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL,
+                    &mouseColor,
+                    (int)mf);
+
+            gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
+        }
         
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
     player_free(player);
+    enemy_free(pirateShip1);
     world_free(world);
+    world_free(combat);
+    mainMenuBool = 1;
     slog("---==== END %s ====---", argv[0]);
     return 0;
 }

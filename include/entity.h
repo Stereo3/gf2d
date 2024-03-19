@@ -6,6 +6,7 @@
 #include "gfc_types.h"
 #include "gfc_primitives.h"
 #include "simple_logger.h"
+#include "gfc_shape.h"
 
 
 typedef struct Entity_S
@@ -17,6 +18,7 @@ typedef struct Entity_S
     Uint8 isPlayer;
     Uint8 isEnemy;
     float frame;
+    Circle bounds;
 
     Vector2D position;
     
@@ -91,6 +93,11 @@ void entity_clear_all(Entity *ignore);
 //Entity *entity_get_collision_partner(Entity *self);
 
 Entity *entity_get_player(void);
+
+Uint8 entity_collide_check(Entity *self, Entity *other);
+Entity *entity_get_collision_partner(Entity *self);
+
+Uint8 bad_collision_check(Entity *self, Entity *other);
 
 
 

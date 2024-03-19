@@ -158,3 +158,67 @@ Entity *entity_get_player(void)
     return NULL;
 
 }
+
+
+Uint8 entity_collide_check(Entity *self, Entity *other){
+
+    if((!self) || (!other)||(self == other))return 0;
+
+    Circle A;
+    Circle B;
+
+   
+
+    vector2d_copy(A, self->position);
+    //vector2d_add(A, A, self->bounds);
+    A.r = self->bounds.r;
+
+    vector2d_copy(B, other->position);
+    //vector2d_add(B, B, other->bounds);
+    B.r = other->bounds.r;
+
+    //slog("Circle A Values: %f, %f, %f", A.x, A.y, A.r);
+    //slog("Circle B Values: %f, %f, %f", B.x, B.y, B.r);
+    return gfc_circle_overlap(A,B);
+}
+
+
+Entity *entity_get_collision_partner(Entity *self){
+    int i;
+    if(!self)return NULL;
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if (!entity_manager.entity_list[i]._inuse)continue;
+
+        if(self == &entity_manager.entity_list[i])continue;
+
+        if(entity_collide_check(self, &entity_manager.entity_list[i]) == 1)
+        {
+            slog("Collided");
+            return &entity_manager.entity_list[i];
+            
+        }
+
+    }
+    return NULL;
+}
+
+/* Uint8 bad_collision_check(Entity *self, Entity *other)
+{
+    int i;
+    if(!self)return NULL;
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if (!entity_manager.entity_list[i]._inuse)continue;
+
+        if(self == &entity_manager.entity_list[i])continue;
+
+        if(&self->position == &other->position)
+        {
+            return 1;
+            slog("Collided");
+        }
+
+    }
+} */
+
