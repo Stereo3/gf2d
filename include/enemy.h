@@ -6,7 +6,7 @@
 #include "entity.h"
 #include "player.h"
 
-static float enemySpeed, movementBudget_x, movementBudget_y;
+//static float enemySpeed, movementBudget_x, movementBudget_y;
 
 void enemy_think(Entity *self);
 void enemy_update(Entity *self);

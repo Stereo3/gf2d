@@ -20,6 +20,7 @@ Entity *enemy_new(Vector2D enemyPosition)
     enemy->health = 100;
     enemy->healthPool = enemy->health;
     enemy->hasAttacked = 0;
+    enemy->isAlive = 1;
     
     enemy->bounds.r = 16;
     enemy->bounds.x = enemyPosition.x;
@@ -47,19 +48,19 @@ void enemy_think(Entity *self)
 {
     if(!self)return;
 
-    Vector2D up, down, left, right;
+/*     Vector2D up, down, left, right;
     up = vector2d(0,-enemySpeed);
     down = vector2d(0,enemySpeed);
     left = vector2d(-enemySpeed,0);
-    right = vector2d(enemySpeed,0);
+    right = vector2d(enemySpeed,0); */
 
     self->bounds.x = self->position.x;
     self->bounds.y = self->position.y;
 
-    if(movementBudget_x > 0 || movementBudget_y > 0)
+    /*     if(movementBudget_x > 0 || movementBudget_y > 0)
     {
 
-    }
+    } */
 
 }
 
@@ -74,7 +75,11 @@ void enemy_update(Entity *self)
 
     self->frame += 0.01;
     if(self->frame >= 8)self->frame = 5;
-    if(self->health <= 0)enemy_die(self);
+    if(self->health <= 0 && self->isAlive == 1)
+    {
+        self->isAlive = 0;
+        enemy_die(self);
+    }
     if(player->player->hasAttacked)
     {
         enemy_attack(player->player);
@@ -95,9 +100,7 @@ void enemy_die(Entity *self)
     player->gold += 10;
     player->inCombat = 0;
     player->movementBudget_x += 512;
-    player->movementBudget_x += 512;
-
-
+    player->movementBudget_y += 512;
     enemy_free(self);
 }
 

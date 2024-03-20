@@ -10,6 +10,8 @@
 #include "player.h"
 #include "world.h"
 #include "enemy.h"
+#include "town.h"
+#include "npc.h"
 
 int main(int argc, char * argv[])
 {
@@ -18,6 +20,7 @@ int main(int argc, char * argv[])
     const Uint8 * keys;
     World *world;
     World *combat;
+    World *town;
     Uint8 mainMenuBool = 1;
     Sprite *mainMenuImg;
     
@@ -27,6 +30,8 @@ int main(int argc, char * argv[])
     Color mouseColor = gfc_color8(255,100,255,200);
     Player *player;
     Entity *pirateShip1;
+    Entity *town1;
+    Entity *npc1;
     TextLine fps, player_pos, movementBudgets, combatStatus, 
     enemyHealth, playerHealth;
     
@@ -53,7 +58,11 @@ int main(int argc, char * argv[])
     player = player_new("greg");
     world = world_load("maps/testworld.map");
     combat = world_load("maps/combat.map");
+    town = world_load("maps/town.map");
     pirateShip1 = enemy_new(vector2d(320,320));
+    town1 = town_new(vector2d(710, 232));
+    npc1 = npc_new(vector2d(512,350), 1);
+    player->npcBeingTalkedTo = npc1;
     mainMenuImg = gf2d_sprite_load_all("images/mainmenu.png",125,300,1,0);
     world_setup_camera(world);
     /*main game loop*/
@@ -72,6 +81,7 @@ int main(int argc, char * argv[])
             
             if(!mainMenuImg)
             {
+                slog("No Main Menu for you!");
                 return NULL;
             }
             gf2d_graphics_clear_screen();
@@ -107,7 +117,17 @@ int main(int argc, char * argv[])
                     gfc_line_sprintf(enemyHealth,"%i/%i",player->enemyInCombatWith->health,player->enemyInCombatWith->healthPool);
                     font_draw_text(enemyHealth,FS_large,GFC_COLOR_RED,vector2d(625,350));
                     gfc_line_sprintf(playerHealth,"%i/%i",player->player->health,player->player->healthPool);
-                    font_draw_text(playerHealth,FS_large,GFC_COLOR_GREEN,vector2d(256,350));
+                    font_draw_text(playerHealth,FS_large,GFC_COLOR_GREEN,vector2d(275,350));
+                }
+                else if(player->inTown == 1)
+                {
+                   //slog("Town? : %i", player->inTown);
+                   player->npcBeingTalkedTo->hidden = 0;
+                   world_draw(town);
+                   if(player->talkingToNpc == 1)
+                   {
+                    
+                   }
                 }
                 else
                 {
@@ -144,6 +164,7 @@ int main(int argc, char * argv[])
             gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
         }
         
+        if(player->player->health <= 0)done = 1;
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }

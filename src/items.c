@@ -35,10 +35,6 @@ void items_close()
 {
     if (_itemJson)
     {
-Item *item_new(const char *name);
-
-void item_free(Item *item);
-
         sj_free(_itemJson);
     }
     _itemJson = NULL;

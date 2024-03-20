@@ -6,7 +6,7 @@
             "sprite":
             {
                 "filename":"images/itemslist.png",
-                "frame":1,
+                "frame":1
             },
             "price":100,
             "type":"melee",

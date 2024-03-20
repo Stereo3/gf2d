@@ -38,6 +38,13 @@ Player *player_new(const char *thePlayerName)
     player->position = vector2d(64,64);
     player->isPlayer = 1;
     player->entityName = thePlayerName;
+    player->bounds.x = player->position.x;
+    player->bounds.y = player->position.y;
+    player->bounds.r = 64;
+    player->health = 100;
+    player->healthPool = player->health;
+    player->hasAttacked = 0;
+    player->isAlive = 1;
 
     slog("The Players Chosen Name: %s \n", thePlayerName);
 
@@ -48,13 +55,7 @@ Player *player_new(const char *thePlayerName)
     thePlayer.movementBudget_y = 128;
     thePlayer.inCombat = 0;
     thePlayer.movementEnabled = 1;
-
-    thePlayer.player->bounds.x = thePlayer.player->position.x;
-    thePlayer.player->bounds.y = thePlayer.player->position.y;
-    thePlayer.player->bounds.r = 64;
-    thePlayer.player->health = 100;
-    thePlayer.player->healthPool = thePlayer.player->health;
-    thePlayer.player->hasAttacked = 0;
+    thePlayer.inTown = 0;
 
     //slog("Player Bounds Values: X:%f Y:%f R:%f", thePlayer.player->bounds.x,thePlayer.player->bounds.y,thePlayer.player->bounds.r);
 
@@ -67,6 +68,14 @@ void player_attack(Entity *target)
     target->health -= rng_machine(1,15,1);
     thePlayer.player->hasAttacked = 1;
     //slog("Enemy health: %i", target->health);
+}
+
+void player_talk_to_npc(Player *self, Entity *npcToTalkTo)
+{
+    if(!self)return;
+    if(!npcToTalkTo)return;
+    self->talkingToNpc = 1;
+    npcToTalkTo->beingTalkedTo = 1;
 }
 
 void player_think(Player *self)
@@ -123,29 +132,29 @@ void player_think(Player *self)
     {
         if(self->movementBudget_x > 0 || self->movementBudget_y > 0)
         {
-            if (keys[SDL_SCANCODE_W] && self->movementBudget_x > 0)
+            if (keys[SDL_SCANCODE_W] && self->movementBudget_y > 0)
             {
                 //vector3d_add(self->position,self->position,forward);
                 vector2d_add(self->player->position,self->player->position,up);
-                self->movementBudget_x -= 1;
+                self->movementBudget_y -= 1;
             }
-            if (keys[SDL_SCANCODE_S] && self->movementBudget_x > 0)
+            if (keys[SDL_SCANCODE_S] && self->movementBudget_y > 0)
             {
                 //vector3d_add(self->position,self->position,-forward);
                 vector2d_add(self->player->position,self->player->position,down);
-                self->movementBudget_x -= 1;
+                self->movementBudget_y -= 1;
             }
-            if (keys[SDL_SCANCODE_D] && self->movementBudget_y > 0)
+            if (keys[SDL_SCANCODE_D] && self->movementBudget_x > 0)
             {
                 //vector3d_add(self->position,self->position,right);
                 vector2d_add(self->player->position,self->player->position,right);
-                self->movementBudget_y -= 1;
+                self->movementBudget_x -= 1;
             }
-            if (keys[SDL_SCANCODE_A] && self->movementBudget_y > 0)
+            if (keys[SDL_SCANCODE_A] && self->movementBudget_x > 0)
             {
                 //vector3d_add(self->position,self->position,-right);
                 vector2d_add(self->player->position,self->player->position,left);
-                self->movementBudget_y -= 1;
+                self->movementBudget_x -= 1;
             }
 
             if(keys[SDL_SCANCODE_N])
@@ -174,10 +183,51 @@ void player_think(Player *self)
             self->movementEnabled = 0;
             vector2d_copy(self->lastLocation, self->player->position);
             //slog("1 Enemey Position: X:%f | Y:%f", collisionPartner->position.x, collisionPartner->position.y);
-            self->player->position = vector2d(256,300);
+            self->player->position = vector2d(256,150);
             collisionPartner->position = vector2d(600,150);
             self->enemyInCombatWith = collisionPartner;
             self->inCombat = 1;
+            player_swap_sprite(self, 1);
+        }
+        else if(collisionPartner->isTown == 1)
+        {
+            self->lastTownVisited = collisionPartner;
+            vector2d_copy(self->lastLocation, self->player->position);
+            self->lastLocation.x -= 10;
+            self->player->position = vector2d(64,300);
+            collisionPartner->position = vector2d(-10,-10);
+            self->inTown = 1;
+        }
+        else if(collisionPartner->isNpc == 1)
+        {
+            self->npcBeingTalkedTo = collisionPartner;
+            player_talk_to_npc(self,self->npcBeingTalkedTo);
+            switch(event.type)
+            {
+                case SDL_KEYDOWN:
+                    switch(event.key.keysym.sym)
+                    {
+                        case SDLK_1:
+                            self->chosenDialougeOption = 1;
+                            break;
+                        case SDLK_2:
+                            self->chosenDialougeOption = 2;
+                            break;
+                    }
+                    break;
+            }
+        }
+        
+    }
+
+    if(self->inTown == 1)
+    {
+        if(keys[SDL_SCANCODE_L])
+        {
+            vector2d_copy(self->player->position, self->lastLocation);
+            self->lastTownVisited->position = self->lastTownVisited->lastPosition;
+            self->npcBeingTalkedTo->hidden = 1;
+            self->inTown = 0;
         }
     }
     
@@ -203,8 +253,10 @@ void player_think(Player *self)
         }
         else
         {
+            self->enemyInCombatWith = NULL;
             vector2d_copy(self->player->position, self->lastLocation);
             self->movementEnabled = 1;
+            player_swap_sprite(self, 0);
         }
     }
     
@@ -214,9 +266,18 @@ void player_think(Player *self)
 void player_update(Player *self)
 {
     if(!self)return;
-    self->player->frame += 0.1;
+    
     //slog("Frame: %f", self->player->frame);
-    if(self->player->frame >= 27)self->player->frame = 19;
+    if(self->shipMode == 1)
+    {
+        self->player->frame += 0.01;
+        if(self->player->frame >= 12)self->player->frame = 9;
+    }
+    else
+    {
+        self->player->frame += 0.1;
+        if(self->player->frame >= 27)self->player->frame = 19;
+    }
     if(self->player->position.x <= 48)self->player->position.x = 48;
     if(self->player->position.x >= 1090)self->player->position.x = 1090;
     if(self->player->position.y <= 48)self->player->position.y = 48;
@@ -238,9 +299,32 @@ void player_free(Player *self)
     slog("exsists?: %i | Player Freed", thePlayer.exsits);
 }
 
-Player *player_get_player()
+Player *player_get_player(void)
 {
     return &thePlayer;
+}
+
+void player_swap_sprite(Player *self, int whatSprite)
+{
+    switch(whatSprite)
+    {
+        case 0:
+            self->player->sprite = gf2d_sprite_load_all("images/skelebones.png",64,64,9,0);
+            self->player->frame = 19;
+            self->shipMode = 0;
+            break;
+        case 1:
+            self->player->sprite = gf2d_sprite_load_all("images/pirateship.png",178,214,4,0);
+            self->player->frame = 9;
+            self->shipMode = 1;
+            break;
+        default:
+            self->player->sprite = gf2d_sprite_load_all("images/skelebones.png",64,64,9,0);
+            self->player->frame = 19;
+            self->shipMode = 0;
+            break;
+    }
+  
 }
 
 

@@ -62,6 +62,9 @@ Entity *entity_new()
             entity_manager.entity_list[i].health = 100;
             entity_manager.entity_list[i].isPlayer = 0;
             entity_manager.entity_list[i].isEnemy = 0;
+            entity_manager.entity_list[i].isTown = 0;
+            entity_manager.entity_list[i].isNpc = 0;
+
 
             //slog("made new entity");
             return &entity_manager.entity_list[i];
@@ -119,6 +122,7 @@ void entity_update_all()
 void entity_draw(Entity *self)
 {
     if(!self)return;
+    if(self->hidden)return;
     if(self->sprite)
     {
         gf2d_sprite_render(
@@ -162,6 +166,22 @@ Entity *entity_get_player(void)
 
 }
 
+Entity *entity_get_npc(void)
+{
+    int i;
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if (!entity_manager.entity_list[i]._inuse)continue;
+
+        if(entity_manager.entity_list[i].isNpc == 1)
+        {
+            return &entity_manager.entity_list[i];
+        }
+    }
+    return NULL;
+}
+
+
 
 Uint8 entity_collide_check(Entity *self, Entity *other){
 
@@ -197,7 +217,7 @@ Entity *entity_get_collision_partner(Entity *self){
 
         if(entity_collide_check(self, &entity_manager.entity_list[i]) == 1)
         {
-            slog("Collided");
+            //slog("Collided");
             return &entity_manager.entity_list[i];
             
         }

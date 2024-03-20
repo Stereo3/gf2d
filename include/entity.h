@@ -15,13 +15,13 @@ typedef struct Entity_S
     Sprite *sprite;
     Uint8 hidden;
     Uint8 selected;
-    Uint8 isPlayer;
-    Uint8 isEnemy;
+    Uint8 isPlayer, isEnemy, isTown, isNpc;
     Uint8 hasAttacked;
+    Uint8 beingTalkedTo;
     float frame;
     Circle bounds;
 
-    Vector2D position;
+    Vector2D position, lastPosition;
     
     const char *entityName;
     
@@ -32,6 +32,7 @@ typedef struct Entity_S
     void *customData;
 
     int health, healthPool;
+    Uint8 isAlive;
 
 }Entity;
 
@@ -88,12 +89,9 @@ void entity_update_all();
 */
 void entity_clear_all(Entity *ignore);
 
-
-//Uint8 entity_collide_check(Entity *self, Entity *other);
-
-//Entity *entity_get_collision_partner(Entity *self);
-
 Entity *entity_get_player(void);
+
+Entity *entity_get_npc(void);
 
 Uint8 entity_collide_check(Entity *self, Entity *other);
 Entity *entity_get_collision_partner(Entity *self);
