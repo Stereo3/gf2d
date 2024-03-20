@@ -1,6 +1,6 @@
 #include "town.h"
 
-Entity *town_new(Vector2D townPosition)
+Entity *town_new(Vector2D townPosition, const char * townName)
 {
     Entity *town;
 
@@ -19,6 +19,7 @@ Entity *town_new(Vector2D townPosition)
     town->bounds.y = townPosition.y;
     town->bounds.r = 1;
     town->isTown = 1;
+    town->entityName = townName;
 
     return town;
 }

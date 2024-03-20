@@ -20,7 +20,7 @@ int main(int argc, char * argv[])
     const Uint8 * keys;
     World *world;
     World *combat;
-    World *town;
+    World *town_w_1, *town_w_2;
     Uint8 mainMenuBool = 1;
     Sprite *mainMenuImg;
     
@@ -30,10 +30,10 @@ int main(int argc, char * argv[])
     Color mouseColor = gfc_color8(255,100,255,200);
     Player *player;
     Entity *pirateShip1;
-    Entity *town1;
+    Entity *town1, *town2;
     Entity *npc1;
     TextLine fps, player_pos, movementBudgets, combatStatus, 
-    enemyHealth, playerHealth;
+    enemyHealth, playerHealth, npcDialouge;
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -58,9 +58,11 @@ int main(int argc, char * argv[])
     player = player_new("greg");
     world = world_load("maps/testworld.map");
     combat = world_load("maps/combat.map");
-    town = world_load("maps/town.map");
+    town_w_1 = world_load("maps/town.map");
+    town_w_2 = world_load("maps/town2.map");
     pirateShip1 = enemy_new(vector2d(320,320));
-    town1 = town_new(vector2d(710, 232));
+    town1 = town_new(vector2d(710, 232), "firstville");
+    town2 = town_new(vector2d(972,522),"secondale");
     npc1 = npc_new(vector2d(512,350), 1);
     player->npcBeingTalkedTo = npc1;
     mainMenuImg = gf2d_sprite_load_all("images/mainmenu.png",125,300,1,0);
@@ -107,6 +109,7 @@ int main(int argc, char * argv[])
             player_update(player);
             enemy_think(pirateShip1);
             enemy_update(pirateShip1);
+            npc_think(npc1);
             
             gf2d_graphics_clear_screen();// clears drawing buffers
             // all drawing should happen betweem clear_screen and next_frame
@@ -122,12 +125,25 @@ int main(int argc, char * argv[])
                 else if(player->inTown == 1)
                 {
                    //slog("Town? : %i", player->inTown);
-                   player->npcBeingTalkedTo->hidden = 0;
-                   world_draw(town);
-                   if(player->talkingToNpc == 1)
+                   if(gfc_stricmp(player->lastTownVisited->entityName,town1->entityName))
+                   {
+                        player->npcBeingTalkedTo->hidden = 0;
+                        world_draw(town_w_1);
+                        if(player->talkingToNpc == 1)
+                        {
+                            if(npc1->beingTalkedTo == 1)
+                            {
+                                gfc_line_sprintf(npcDialouge, npc_dialouge_tree());
+                                font_draw_text(npcDialouge,FS_large,GFC_COLOR_WHITE,vector2d(0,0));
+                            }
+                            
+                        }
+                   }
+                   else if(gfc_stricmp(player->lastTownVisited->entityName,town2->entityName))
                    {
                     
                    }
+
                 }
                 else
                 {

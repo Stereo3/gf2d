@@ -10,6 +10,6 @@ void town_think(Entity *self);
 void town_update(Entity *self);
 void town_free(Entity *self);
 
- Entity *town_new(Vector2D townPosition);
+ Entity *town_new(Vector2D townPosition, const char * townName);
 
 #endif

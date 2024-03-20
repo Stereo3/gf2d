@@ -12,7 +12,7 @@ Entity *npc_new(Vector2D npcPosition, Uint8 hiddenWhenSpawned)
         return NULL;
     }
 
-    npc->sprite = gf2d_sprite_load_all("images/pirateship.png",178,214,4,0);
+    npc->sprite = gf2d_sprite_load_all("images/characters/Merchant.png",50,56,4,0);
     npc->position = npcPosition;
     npc->lastPosition = npcPosition;
 
@@ -29,7 +29,7 @@ Entity *npc_new(Vector2D npcPosition, Uint8 hiddenWhenSpawned)
 void npc_think(Entity *self)
 {
     if(!self)return;
-    if(self->beingTalkedTo == 1)npc_dialouge_tree();
+    //slog("Is Npc Talking?: %i", self->beingTalkedTo);
 }
 
 const char * npc_dialouge_tree()
@@ -41,16 +41,18 @@ const char * npc_dialouge_tree()
     {
         case 1:
             player->chosenDialougeOption = 0;
+            slog("Chose 1");
             return "Hey there sonny!";
             break;
         case 2:
             player->chosenDialougeOption = 0;
+            slog("Chose 2");
             return "What?";
             break;
     default:
         break;
     }
-    return "How the hell did you get here?";
+    return "";
 }
 
 void npc_free(Entity *self)
