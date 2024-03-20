@@ -12,6 +12,6 @@ void npc_free(Entity *self);
 
 Entity *npc_new(Vector2D npcPosition, Uint8 hiddenWhenSpawned);
 
-const char * npc_dialouge_tree();
+void npc_dialouge_tree(Entity *self);
 
 #endif

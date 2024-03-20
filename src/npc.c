@@ -1,4 +1,5 @@
 #include "npc.h"
+#include "font.h"
 
 Entity *npc_new(Vector2D npcPosition, Uint8 hiddenWhenSpawned)
 {
@@ -30,9 +31,10 @@ void npc_think(Entity *self)
 {
     if(!self)return;
     //slog("Is Npc Talking?: %i", self->beingTalkedTo);
+    if(self->beingTalkedTo)npc_dialouge_tree(self);
 }
 
-const char * npc_dialouge_tree()
+void npc_dialouge_tree(Entity *self)
 {
     Player *player;
     player = player_get_player();
@@ -42,17 +44,14 @@ const char * npc_dialouge_tree()
         case 1:
             player->chosenDialougeOption = 0;
             slog("Chose 1");
-            return "Hey there sonny!";
+            self->sayTheLine = "Hey there Beard! It's been a while!";
             break;
         case 2:
             player->chosenDialougeOption = 0;
+            self->sayTheLine = "THE FUCK YOU SAY TO ME YOU LITTLE SHIT!?";
             slog("Chose 2");
-            return "What?";
             break;
-    default:
-        break;
     }
-    return "";
 }
 
 void npc_free(Entity *self)

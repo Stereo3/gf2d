@@ -56,6 +56,7 @@ Player *player_new(const char *thePlayerName)
     thePlayer.inCombat = 0;
     thePlayer.movementEnabled = 1;
     thePlayer.inTown = 0;
+    thePlayer.chosenDialougeOption = 0;
 
     //slog("Player Bounds Values: X:%f Y:%f R:%f", thePlayer.player->bounds.x,thePlayer.player->bounds.y,thePlayer.player->bounds.r);
 
@@ -76,6 +77,22 @@ void player_talk_to_npc(Player *self, Entity *npcToTalkTo)
     if(!npcToTalkTo)return;
     self->talkingToNpc = 1;
     npcToTalkTo->beingTalkedTo = 1;
+    switch(event.type)
+    {
+        case SDL_KEYDOWN:
+            switch(event.key.keysym.sym)
+            {
+                case SDLK_1:
+                    self->chosenDialougeOption = 1;
+                    break;
+                case SDLK_2:
+                    self->chosenDialougeOption = 2;
+                    break;
+                default:
+                    self->chosenDialougeOption = 0;
+            }
+            break;
+    }
 }
 
 void player_think(Player *self)
@@ -202,20 +219,6 @@ void player_think(Player *self)
         {
             self->npcBeingTalkedTo = collisionPartner;
             player_talk_to_npc(self,self->npcBeingTalkedTo);
-            switch(event.type)
-            {
-                case SDL_KEYDOWN:
-                    switch(event.key.keysym.sym)
-                    {
-                        case SDLK_1:
-                            self->chosenDialougeOption = 1;
-                            break;
-                        case SDLK_2:
-                            self->chosenDialougeOption = 2;
-                            break;
-                    }
-                    break;
-            }
         }
         
     }
@@ -228,6 +231,9 @@ void player_think(Player *self)
             self->lastTownVisited->position = self->lastTownVisited->lastPosition;
             self->npcBeingTalkedTo->hidden = 1;
             self->inTown = 0;
+            self->talkingToNpc = 0;
+            self->movementBudget_x = 512;
+            self->movementBudget_y = 512;
         }
     }
     
@@ -296,6 +302,14 @@ void player_free(Player *self)
     
     self->playerName = NULL;
     thePlayer.exsits = 0;
+    thePlayer.chosenDialougeOption = 0;
+    thePlayer.enemyInCombatWith = NULL;
+    thePlayer.gold = 0;
+    thePlayer.inCombat = 0;
+    thePlayer.inTown = 0;
+    thePlayer.movementBudget_x = 0;
+    thePlayer.movementBudget_y = 0;
+    thePlayer.npcBeingTalkedTo = NULL;
     slog("exsists?: %i | Player Freed", thePlayer.exsits);
 }
 

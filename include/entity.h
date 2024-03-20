@@ -24,6 +24,7 @@ typedef struct Entity_S
     Vector2D position, lastPosition;
     
     const char *entityName;
+    const char *sayTheLine;
     
     void       (*think)(struct Entity_S *self);
     void       (*update)(struct Entity_S *self);

@@ -9,6 +9,8 @@
         "gfc_primitives.h": "c",
         "simple_logger.h": "c",
         "sdl.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "gf2d_sprite.h": "c",
+        "gfc_config.h": "c"
     }
 }

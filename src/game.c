@@ -1,8 +1,10 @@
 #include <SDL.h>
 #include "simple_logger.h"
+#include "simple_json.h"
 
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
+#include "gfc_config.h"
 
 #include "font.h"
 #include "camera.h"
@@ -23,6 +25,7 @@ int main(int argc, char * argv[])
     World *town_w_1, *town_w_2;
     Uint8 mainMenuBool = 1;
     Sprite *mainMenuImg;
+    SJson *json, *saver;
     
     int mx,my;
     float mf = 0;
@@ -33,7 +36,7 @@ int main(int argc, char * argv[])
     Entity *town1, *town2;
     Entity *npc1;
     TextLine fps, player_pos, movementBudgets, combatStatus, 
-    enemyHealth, playerHealth, npcDialouge;
+    enemyHealth, playerHealth, npcDialouge, playerDialougeOption1, playerDialougeOption2;
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -51,18 +54,26 @@ int main(int argc, char * argv[])
     font_init();
     entity_system_init(1024);
     SDL_ShowCursor(SDL_DISABLE);
-    camera_set_size(vector2d(1200,720));
-    
+    camera_set_size(vector2d(1200,720));         
+
+    json = sj_load("saves/save1.save");
+    if(!json)
+    {
+        slog("failed to load save file");
+        return NULL;
+    }
+
+
     /*demo setup*/
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new("greg");
     world = world_load("maps/testworld.map");
     combat = world_load("maps/combat.map");
     town_w_1 = world_load("maps/town.map");
-    town_w_2 = world_load("maps/town2.map");
+    //town_w_2 = world_load("maps/town2.map");
     pirateShip1 = enemy_new(vector2d(320,320));
     town1 = town_new(vector2d(710, 232), "firstville");
-    town2 = town_new(vector2d(972,522),"secondale");
+    //town2 = town_new(vector2d(972,522),"secondale");
     npc1 = npc_new(vector2d(512,350), 1);
     player->npcBeingTalkedTo = npc1;
     mainMenuImg = gf2d_sprite_load_all("images/mainmenu.png",125,300,1,0);
@@ -125,25 +136,24 @@ int main(int argc, char * argv[])
                 else if(player->inTown == 1)
                 {
                    //slog("Town? : %i", player->inTown);
-                   if(gfc_stricmp(player->lastTownVisited->entityName,town1->entityName))
-                   {
-                        player->npcBeingTalkedTo->hidden = 0;
-                        world_draw(town_w_1);
-                        if(player->talkingToNpc == 1)
+                    player->npcBeingTalkedTo->hidden = 0;
+                    world_draw(town_w_1);
+                    player->movementBudget_x = 100000;
+                    player->movementBudget_y = 100000;
+                    if(player->talkingToNpc == 1)
+                    {
+                        gfc_line_sprintf(playerDialougeOption1, "1. Hey there... Steve?");
+                        font_draw_text(playerDialougeOption1, FS_large,GFC_COLOR_GREEN,vector2d(0,35));
+                        gfc_line_sprintf(playerDialougeOption2, "2. Skibidi rizz in Ohio, snarkle steez swag god the toilet.");
+                        font_draw_text(playerDialougeOption2, FS_large,GFC_COLOR_RED,vector2d(0,80));
+                        
+                        if(npc1->beingTalkedTo == 1)
                         {
-                            if(npc1->beingTalkedTo == 1)
-                            {
-                                gfc_line_sprintf(npcDialouge, npc_dialouge_tree());
-                                font_draw_text(npcDialouge,FS_large,GFC_COLOR_WHITE,vector2d(0,0));
-                            }
-                            
+                            gfc_line_sprintf(npcDialouge, npc1->sayTheLine);
+                            font_draw_text(npcDialouge,FS_large,GFC_COLOR_WHITE,vector2d(0,0));
                         }
-                   }
-                   else if(gfc_stricmp(player->lastTownVisited->entityName,town2->entityName))
-                   {
-                    
-                   }
-
+                        
+                    }
                 }
                 else
                 {
@@ -184,6 +194,13 @@ int main(int argc, char * argv[])
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
+    saver = sj_object_get_value(json,"player_location");
+    sj_object_delete_key(saver, "coordinates");
+    sj_object_insert(saver,"coordinates",sj_vector2d_new(player->player->position));
+
+    sj_save(json,"saves/save1.save");
+    sj_free(saver);
+    sj_free(json);
     player_free(player);
     enemy_free(pirateShip1);
     world_free(world);
