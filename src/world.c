@@ -116,7 +116,7 @@ World *world_load(const char *filename)
     for (j = 0; j < h;j++)
     {
         horizontal = sj_array_get_nth(vertical,j);
-        if (!horizontal)continue; //this might be worth erroring over, but for now just skip
+        if (!horizontal)continue;
         for (i = 0; i < w;i++)
         {
             item = sj_array_get_nth(horizontal,i);

@@ -40,6 +40,7 @@ int main(int argc, char * argv[])
     Entity *npc1;
     TextLine fps, player_pos, movementBudgets, combatStatus, 
     enemyHealth, playerHealth, npcDialouge, playerDialougeOption1, playerDialougeOption2;
+
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -74,11 +75,11 @@ int main(int argc, char * argv[])
     world = world_load("maps/testworld.map");
     combat = world_load("maps/combat.map");
     town_w_1 = world_load("maps/town.map");
-    //town_w_2 = world_load("maps/town2.map");
+    town_w_2 = world_load("maps/town2.map");
     pirateShip1 = enemy_new(vector2d(320,320));
     town1 = town_new(vector2d(710, 232), "firstville");
-    //town2 = town_new(vector2d(972,522),"secondale");
-    npc1 = npc_new(vector2d(512,350), 1);
+    town2 = town_new(vector2d(972,522),"secondale");
+    npc1 = npc_new(vector2d(-1000,-1000), 1);
     player->npcBeingTalkedTo = npc1;
     mainMenuImg = gf2d_sprite_load_all("images/mainmenu.png",125,300,1,0);
     world_setup_camera(world);
@@ -147,24 +148,38 @@ int main(int argc, char * argv[])
                 }
                 else if(player->inTown == 1)
                 {
-                   //slog("Town? : %i", player->inTown);
-                    player->npcBeingTalkedTo->hidden = 0;
-                    world_draw(town_w_1);
-                    player->movementBudget_x = 100000;
-                    player->movementBudget_y = 100000;
-                    if(player->talkingToNpc == 1)
+                    if(gfc_stricmp(player->lastTownVisited->entityName, "firstville") == 0)
                     {
-                        gfc_line_sprintf(playerDialougeOption1, "1. Hey there... Steve?");
-                        font_draw_text(playerDialougeOption1, FS_large,GFC_COLOR_GREEN,vector2d(0,35));
-                        gfc_line_sprintf(playerDialougeOption2, "2. Skibidi rizz in Ohio, snarkle steez swag god the toilet.");
-                        font_draw_text(playerDialougeOption2, FS_large,GFC_COLOR_RED,vector2d(0,80));
-                        
-                        if(npc1->beingTalkedTo == 1)
+                    //slog("Town? : %i", player->inTown);
+                        npc1->position = vector2d(512,350);
+                        player->npcBeingTalkedTo->hidden = 0;
+                        world_draw(town_w_1);
+                        player->movementBudget_x = 100000;
+                        player->movementBudget_y = 100000;
+                        if(player->talkingToNpc == 1)
                         {
-                            gfc_line_sprintf(npcDialouge, npc1->sayTheLine);
-                            font_draw_text(npcDialouge,FS_large,GFC_COLOR_WHITE,vector2d(0,0));
+                            gfc_line_sprintf(playerDialougeOption1, "1. Hey there... Steve?");
+                            font_draw_text(playerDialougeOption1, FS_large,GFC_COLOR_GREEN,vector2d(0,35));
+                            gfc_line_sprintf(playerDialougeOption2, "2. Skibidi rizz in Ohio, snarkle steez swag god the toilet.");
+                            font_draw_text(playerDialougeOption2, FS_large,GFC_COLOR_RED,vector2d(0,80));
+                            
+                            if(npc1->beingTalkedTo == 1)
+                            {
+                                gfc_line_sprintf(npcDialouge, npc1->sayTheLine);
+                                font_draw_text(npcDialouge,FS_large,GFC_COLOR_WHITE,vector2d(0,0));
+                            }
+                            
                         }
-                        
+                    }
+                    else if(gfc_stricmp(player->lastTownVisited->entityName, "secondale") == 0)
+                    {
+                        world_draw(town_w_2);
+                        player->movementBudget_x = 100000;
+                        player->movementBudget_y = 100000;
+                    }
+                    else
+                    {
+                        slog("No town to visit");
                     }
                 }
                 else

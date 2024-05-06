@@ -2,14 +2,6 @@
 
 #include "camera.h"
 
-typedef struct
-{
-    Vector2D position;
-    Vector2D size;      // width and height of the screen
-    Rect     bounds;    //keep the camera in here
-    Bool     bindCamera;// if true, keep the camera in bounds
-}Camera;
-
 static Camera _camera = {0};
 
 void camera_set_bounds(Rect bounds)
@@ -65,6 +57,12 @@ void camera_apply_bounds()
     }
     if (_camera.position.x < _camera.bounds.x)_camera.position.x = _camera.bounds.x;
     if (_camera.position.y < _camera.bounds.y)_camera.position.y = _camera.bounds.y;
+}
+
+Camera *get_camera()
+{
+    Camera *the_camera = &_camera;
+    return the_camera;
 }
 
 /*eol@eof*/

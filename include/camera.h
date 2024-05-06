@@ -4,6 +4,14 @@
 #include "gfc_vector.h"
 #include "gfc_shape.h"
 
+typedef struct
+{
+    Vector2D position;
+    Vector2D size;      // width and height of the screen
+    Rect     bounds;    //keep the camera in here
+    Bool     bindCamera;// if true, keep the camera in bounds
+}Camera;
+
 /**
  * @brief get the camera's position in world space
  * @return the position
@@ -38,5 +46,7 @@ void camera_set_bounds(Rect bounds);
 void camera_enable_binding(Bool bindCamera);
 
 void camera_center_on(Vector2D target);
+
+Camera *get_camera();
 
 #endif

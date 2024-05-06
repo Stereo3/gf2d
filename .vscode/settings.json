@@ -11,6 +11,8 @@
         "sdl.h": "c",
         "time.h": "c",
         "gf2d_sprite.h": "c",
-        "gfc_config.h": "c"
+        "gfc_config.h": "c",
+        "camera.h": "c",
+        "enemy.h": "c"
     }
 }

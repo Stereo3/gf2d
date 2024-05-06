@@ -7,6 +7,7 @@
 #include "gfc_primitives.h"
 #include "simple_logger.h"
 #include "gfc_shape.h"
+#include "camera.h"
 
 
 typedef struct Entity_S
@@ -94,12 +95,16 @@ Entity *entity_get_player(void);
 
 Entity *entity_get_npc(void);
 
+Entity *entity_get_enemy(void);
+
 Uint8 entity_collide_check(Entity *self, Entity *other);
 Entity *entity_get_collision_partner(Entity *self);
 
 Uint8 bad_collision_check(Entity *self, Entity *other);
 
 int rng_machine(int lower, int upper, int count); 
+
+void update_enemy_positions();
 
 
 

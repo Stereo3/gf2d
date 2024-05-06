@@ -181,7 +181,20 @@ Entity *entity_get_npc(void)
     return NULL;
 }
 
+Entity *entity_get_enemy(void)
+{
+    int i;
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if (!entity_manager.entity_list[i]._inuse)continue;
 
+        if(entity_manager.entity_list[i].isEnemy == 1)
+        {
+            return &entity_manager.entity_list[i];
+        }
+    }
+    return NULL;
+}
 
 Uint8 entity_collide_check(Entity *self, Entity *other){
 
@@ -237,6 +250,53 @@ int rng_machine(int lower, int upper, int count)
         return num; 
     } 
 }
+
+Vector2D calculate_new_camera_position()
+{
+    Entity *player = entity_get_player();
+    Vector2D player_position = player->position;
+    
+    Camera *the_camera = get_camera();
+    Vector2D target_position;
+
+    target_position.x = player_position.x - (the_camera->size.x * 0.5);
+    target_position.y = player_position.y - (the_camera->size.y * 0.5);
+    
+    return target_position;
+}
+
+
+/* void update_enemy_positions()
+{
+    int i, e, enemy_count;
+
+    Vector2D old_camera_position = camera_get_position();
+
+    Vector2D new_camera_position = calculate_new_camera_position();
+
+    Vector2D position_difference;
+    vector2d_sub(position_difference,new_camera_position,old_camera_position);
+
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if (!entity_manager.entity_list[i]._inuse)continue;
+
+        if(entity_manager.entity_list[i].isEnemy == 1)
+        {
+            enemy_count++;
+        }
+    }
+
+    for (e = 0; e < enemy_count; e++)
+    {
+        Vector2D enemy_position = get_enemy_position(i);
+        enemy_position = vector2d_add(enemy_position, position_difference);
+        set_enemy_position(i, enemy_position);
+    }
+    
+}
+ */
+
 
 /* Uint8 bad_collision_check(Entity *self, Entity *other)
 {

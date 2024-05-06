@@ -109,3 +109,8 @@ void enemy_free(Entity *self)
     if(!self)return;
     entity_free(self);
 }
+
+Vector2D get_enemy_position(Entity *self)
+{
+    return self->position;
+}
