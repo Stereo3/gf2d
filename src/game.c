@@ -1,10 +1,12 @@
 #include <SDL.h>
 #include "simple_logger.h"
 #include "simple_json.h"
+#include <SDL_mixer.h>
 
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
 #include "gfc_config.h"
+#include "gfc_audio.h"
 
 #include "font.h"
 #include "camera.h"
@@ -26,6 +28,7 @@ int main(int argc, char * argv[])
     Uint8 mainMenuBool = 1;
     Sprite *mainMenuImg;
     SJson *json, *saver;
+    Sound *ambiance;
     
     int mx,my;
     float mf = 0;
@@ -55,6 +58,7 @@ int main(int argc, char * argv[])
     entity_system_init(1024);
     SDL_ShowCursor(SDL_DISABLE);
     camera_set_size(vector2d(1200,720));         
+    gfc_audio_init(128,32,0,32,1,0);
 
     json = sj_load("saves/save1.save");
     if(!json)
@@ -78,6 +82,14 @@ int main(int argc, char * argv[])
     player->npcBeingTalkedTo = npc1;
     mainMenuImg = gf2d_sprite_load_all("images/mainmenu.png",125,300,1,0);
     world_setup_camera(world);
+    ambiance = gfc_sound_load("music/bgm.mp3", 1,1);
+    if(!ambiance)
+    {
+        //slog error why
+        slog("AMBIANCE IS NULL RAHHHHHHHHH \n");
+        return NULL;
+    }
+    gfc_sound_play(ambiance,5,.025,-1,-1);
     /*main game loop*/
     while(!done)
     {
