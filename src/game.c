@@ -80,7 +80,7 @@ int main(int argc, char * argv[])
     pirateShip1 = enemy_new(vector2d(320,320), 0);
     //TEST = enemy_new(vector2d(320,520), 2);
     town1 = town_new(vector2d(832,272), "firstville");
-    town2 = town_new(vector2d(972,522),"secondale");
+    town2 = town_new(vector2d(1408,688),"secondale");
     npc1 = npc_new(vector2d(-1000,-1000), 1);
     player->npcBeingTalkedTo = npc1;
     mainMenuImg = gf2d_sprite_load_all("images/mainmenu.png",125,300,1,0);
@@ -154,6 +154,7 @@ int main(int argc, char * argv[])
                     {
                     //slog("Town? : %i", player->inTown);
                         npc1->position = vector2d(512,350);
+                        town2->position = vector2d(-1000,-1000);
                         player->npcBeingTalkedTo->hidden = 0;
                         world_draw(town_w_1);
                         player->movementBudget_x = 100000;

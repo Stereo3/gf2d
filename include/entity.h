@@ -33,6 +33,8 @@ typedef struct Entity_S
     void       (*update)(struct Entity_S *self);
     void       (*free)(struct Entity_S *self);
 
+    //struct Entity_S *
+
     void *customData;
 
     int health, healthPool;
