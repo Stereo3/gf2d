@@ -13,7 +13,7 @@ Entity *npc_new(Vector2D npcPosition, Uint8 hiddenWhenSpawned)
         return NULL;
     }
 
-    npc->sprite = gf2d_sprite_load_all("images/characters/Merchant.png",50,56,4,0);
+    npc->sprite = gf2d_sprite_load_all("images/characters/Merchant.png",50,56,4,1);
     npc->position = npcPosition;
     npc->lastPosition = npcPosition;
 

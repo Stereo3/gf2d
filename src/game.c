@@ -39,7 +39,8 @@ int main(int argc, char * argv[])
     Entity *town1, *town2;
     Entity *npc1;
     TextLine fps, player_pos, movementBudgets, combatStatus, 
-    enemyHealth, playerHealth, npcDialouge, playerDialougeOption1, playerDialougeOption2;
+    enemyHealth, playerHealth, npcDialouge, playerDialougeOption1, playerDialougeOption2,
+    townStatus;
 
     
     /*program initializtion*/
@@ -76,8 +77,9 @@ int main(int argc, char * argv[])
     combat = world_load("maps/combat.map");
     town_w_1 = world_load("maps/town.map");
     town_w_2 = world_load("maps/town2.map");
-    pirateShip1 = enemy_new(vector2d(320,320));
-    town1 = town_new(vector2d(710, 232), "firstville");
+    pirateShip1 = enemy_new(vector2d(320,320), 0);
+    //TEST = enemy_new(vector2d(320,520), 2);
+    town1 = town_new(vector2d(832,272), "firstville");
     town2 = town_new(vector2d(972,522),"secondale");
     npc1 = npc_new(vector2d(-1000,-1000), 1);
     player->npcBeingTalkedTo = npc1;
@@ -189,6 +191,7 @@ int main(int argc, char * argv[])
                 //slog("Player in Combat: %i", player->inCombat);
             
                 entity_draw_all();
+                //entity_draw_to_surface_test(TEST, world);
                 
                 if(keys[SDL_SCANCODE_TAB])
                 {
@@ -200,6 +203,8 @@ int main(int argc, char * argv[])
                     font_draw_text(movementBudgets,FS_small,GFC_COLOR_RED,vector2d(10,70));
                     gfc_line_sprintf(combatStatus,"Combat Status: %i",player->inCombat);
                     font_draw_text(combatStatus,FS_small,GFC_COLOR_ORANGE,vector2d(10,100));
+                    gfc_line_sprintf(townStatus,"Town Status: %i",player->inTown);
+                    font_draw_text(townStatus,FS_small,GFC_COLOR_ORANGE,vector2d(10,130));
 
                 }
                 

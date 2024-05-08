@@ -8,6 +8,7 @@
 #include "simple_logger.h"
 #include "gfc_shape.h"
 #include "camera.h"
+#include "world.h"
 
 
 typedef struct Entity_S
@@ -16,11 +17,12 @@ typedef struct Entity_S
     Sprite *sprite;
     Uint8 hidden;
     Uint8 selected;
-    Uint8 isPlayer, isEnemy, isTown, isNpc;
+    Uint8 isPlayer, isEnemy, isTown, isNpc, PLACEHOLDER;
     Uint8 hasAttacked;
     Uint8 beingTalkedTo;
     float frame;
     Circle bounds;
+    Uint32 enemyType;
 
     Vector2D position, lastPosition;
     
@@ -104,7 +106,9 @@ Uint8 bad_collision_check(Entity *self, Entity *other);
 
 int rng_machine(int lower, int upper, int count); 
 
-void update_enemy_positions();
+//void update_enemy_positions();
+
+//void entity_draw_to_surface_test(Entity *self, World *worldToDrawTo);
 
 
 

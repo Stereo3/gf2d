@@ -285,9 +285,9 @@ void player_update(Player *self)
         if(self->player->frame >= 27)self->player->frame = 19;
     }
     if(self->player->position.x <= 48)self->player->position.x = 48;
-    if(self->player->position.x >= 1090)self->player->position.x = 1090;
+    if(self->player->position.x >= 1536)self->player->position.x = 1536;
     if(self->player->position.y <= 48)self->player->position.y = 48;
-    if(self->player->position.y >= 592)self->player->position.y = 592;
+    if(self->player->position.y >= 768)self->player->position.y = 768;
 
     self->player->bounds.x = self->player->position.x;
     self->player->bounds.y = self->player->position.y;

@@ -64,6 +64,7 @@ Entity *entity_new()
             entity_manager.entity_list[i].isEnemy = 0;
             entity_manager.entity_list[i].isTown = 0;
             entity_manager.entity_list[i].isNpc = 0;
+            entity_manager.entity_list[i].enemyType = 0;
 
 
             //slog("made new entity");
@@ -121,13 +122,17 @@ void entity_update_all()
 
 void entity_draw(Entity *self)
 {
+    Vector2D drawPosition;
+
+    vector2d_add(drawPosition, self->position,camera_get_offset());
+
     if(!self)return;
     if(self->hidden)return;
     if(self->sprite)
     {
         gf2d_sprite_render(
         self->sprite,
-        self->position,
+        drawPosition,
         NULL,
         NULL,
         NULL,
@@ -143,12 +148,30 @@ void entity_draw_all()
     int i;
     for (i = 0; i < entity_manager.entity_count; i++)
     {
+        
         if (!entity_manager.entity_list[i]._inuse)continue;
         //slog("Entity to draw: %s", entity_manager.entity_list[i].entityName);
+        //if (entity_manager.entity_list[i].PLACEHOLDER)continue;
         entity_draw(&entity_manager.entity_list[i]);
     }    
 }
 
+/* void entity_draw_to_surface_test(Entity *self, World *worldToDrawTo)
+{
+    if(!self)return;
+    if(self->hidden)return;
+    if(self->sprite)
+    {
+    gf2d_sprite_draw_to_surface(
+    self->sprite,
+    self->position,
+    NULL,
+    NULL,
+    self->frame,
+    worldToDrawTo->tileLayer->surface
+    );
+    }
+} */
 
 Entity *entity_get_player(void)
 {
@@ -251,7 +274,7 @@ int rng_machine(int lower, int upper, int count)
     } 
 }
 
-Vector2D calculate_new_camera_position()
+/* Vector2D calculate_new_camera_position()
 {
     Entity *player = entity_get_player();
     Vector2D player_position = player->position;
@@ -263,7 +286,7 @@ Vector2D calculate_new_camera_position()
     target_position.y = player_position.y - (the_camera->size.y * 0.5);
     
     return target_position;
-}
+} */
 
 
 /* void update_enemy_positions()
@@ -316,4 +339,7 @@ Vector2D calculate_new_camera_position()
 
     }
 } */
+
+
+//entity draw modifications from: https://github.com/engineerOfLies/gameframework2d/blob/master/src/gf2d_entity.c
 

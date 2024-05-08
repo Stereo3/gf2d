@@ -14,7 +14,7 @@ void enemy_free(Entity *self);
 void enemy_die(Entity *self);
 Vector2D get_enemy_position(Entity *self);
 
- Entity *enemy_new(Vector2D enemyPosition);
+ Entity *enemy_new(Vector2D enemyPosition, Uint32 enemyType);
 
  void enemy_attack(Entity *target);
 

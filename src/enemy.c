@@ -1,7 +1,7 @@
 #include "enemy.h"
 
 
-Entity *enemy_new(Vector2D enemyPosition)
+Entity *enemy_new(Vector2D enemyPosition, Uint32 enemyType)
 {
     Entity *enemy;
 
@@ -13,9 +13,26 @@ Entity *enemy_new(Vector2D enemyPosition)
         return NULL;
     }
 
-    enemy->sprite = gf2d_sprite_load_all("images/pirateship.png",178,214,4,0);
+    switch (enemyType)
+    {
+    case 0:
+        enemy->sprite = gf2d_sprite_load_all("images/pirateship.png",178,214,4,0);
+        enemy->frame = 5;
+        enemy->enemyType = enemyType;
+        break;
+    case 1:
+        enemy->sprite = gf2d_sprite_load_all("images/characters/Piratecropped.png",44.2,49,10,0);
+        enemy->frame = 1;
+        enemy->enemyType = enemyType;
+        break;
+    case 2:
+        break;
+    default:
+        enemy->sprite = gf2d_sprite_load_all("images/pirateship.png",178,214,4,1);
+        enemy->frame = 5;
+        break;
+    }
     enemy->isEnemy = 1;
-    enemy->frame = 5;
     enemy->position = enemyPosition;
     enemy->health = 100;
     enemy->healthPool = enemy->health;
@@ -73,8 +90,24 @@ void enemy_update(Entity *self)
     player = player_get_player();
     if(!player)return;
 
-    self->frame += 0.01;
-    if(self->frame >= 8)self->frame = 5;
+    switch (self->enemyType)
+    {
+    case 0:
+        self->frame += 0.01;
+        if(self->frame >= 8)self->frame = 5;
+        break;
+    case 1:
+        self->frame += 0.01;
+        if(self->frame >= 10)self->frame = 1;
+        break;
+    case 2:
+        break;
+    default:
+        self->frame += 0.01;
+        if(self->frame >= 8)self->frame = 5;
+        break;
+    }
+
     if(self->health <= 0 && self->isAlive == 1)
     {
         self->isAlive = 0;
