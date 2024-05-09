@@ -258,6 +258,12 @@ void player_think(Player *self)
             self->npcBeingTalkedTo = collisionPartner;
             player_talk_to_npc(self,self->npcBeingTalkedTo);
         }
+        else if(collisionPartner->isItem == 1)
+        {
+            self->gold += 5;
+            gfc_line_sprintf(self->quest3, "");
+            entity_free(collisionPartner);
+        }
         
     }
 

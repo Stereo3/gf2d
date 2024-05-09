@@ -17,7 +17,7 @@ typedef struct Entity_S
     Sprite *sprite;
     Uint8 hidden;
     Uint8 selected;
-    Uint8 isPlayer, isEnemy, isTown, isNpc;
+    Uint8 isPlayer, isEnemy, isTown, isNpc, isItem;
     Uint8 hasAttacked;
     Uint8 beingTalkedTo;
     float frame;

@@ -51,7 +51,7 @@ int main(int argc, char * argv[])
 
     TextLine fps, player_pos, movementBudgets, combatStatus, 
     enemyHealth, playerHealth, npcDialouge, playerDialougeOption1, playerDialougeOption2,
-    townStatus, questText1, questText2;
+    townStatus, questText1, questText2, goldAmount;
 
     
     /*program initializtion*/
@@ -116,6 +116,14 @@ int main(int argc, char * argv[])
     npc1 = npc_new(offscreen, 0);
 
     goldenIdol = entity_new();
+
+    goldenIdol-> position = offscreen;
+    goldenIdol->sprite = gf2d_sprite_load_image("images/goldenIdol.png");
+    goldenIdol->bounds.x = goldenIdol->position.x;
+    goldenIdol->bounds.y = goldenIdol->position.y;
+    goldenIdol->bounds.r = 1;
+    goldenIdol->isItem = 1;
+
     //player->npcBeingTalkedTo = npc1;
 
     mainMenuImg = gf2d_sprite_load_all("images/mainmenu.png",125,300,1,0);
@@ -393,6 +401,7 @@ int main(int argc, char * argv[])
                         town2->position = offscreen;
                         jungle1->position = offscreen;
                         ruins1->position = offscreen;
+                        goldenIdol->position = pirate1Spawnpoint;
                         world_draw(desert_w_1);
                         player->movementBudget_x = 100000;
                         player->movementBudget_y = 100000;
@@ -432,6 +441,9 @@ int main(int argc, char * argv[])
                     font_draw_text(player->quest1,FS_small, GFC_COLOR_YELLOW,vector2d(700,60));
                     font_draw_text(player->quest2,FS_small, GFC_COLOR_YELLOW,vector2d(725,90));
                     font_draw_text(player->quest3,FS_small, GFC_COLOR_YELLOW,vector2d(825,120));
+                    gfc_line_sprintf(goldAmount,"Gold: %i",player->gold);
+                    font_draw_text(goldAmount,FS_small, GFC_COLOR_YELLOW,vector2d(900,150));
+
 
 
                 }

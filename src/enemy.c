@@ -136,10 +136,16 @@ void enemy_die(Entity *self)
     player = player_get_player();
 
     if(!player)return;
-
-    if(player->inTown)
+    switch (self->enemyType)
     {
-        
+    case 0:
+        gfc_line_sprintf(player->quest1, "");
+        break;
+    case 1:
+        gfc_line_sprintf(player->quest2, "");
+        break;
+    default:
+        break;
     }
 
     player->gold += 10;
