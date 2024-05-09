@@ -1,5 +1,8 @@
 #include "enemy.h"
 
+void enemy_think(Entity *self);
+void enemy_update(Entity *self);
+
 
 Entity *enemy_new(Vector2D enemyPosition, Uint32 enemyType)
 {
@@ -16,28 +19,30 @@ Entity *enemy_new(Vector2D enemyPosition, Uint32 enemyType)
     switch (enemyType)
     {
     case 0:
+        enemy->health = 100;
         enemy->sprite = gf2d_sprite_load_all("images/pirateship.png",178,214,4,0);
         enemy->frame = 5;
         enemy->enemyType = enemyType;
         break;
     case 1:
-        enemy->sprite = gf2d_sprite_load_all("images/characters/Piratecropped.png",44.2,49,10,0);
+        enemy->health = 50;
+        enemy->sprite = gf2d_sprite_load_all("images/characters/Piratecropped2.png",58,64,10,0);
         enemy->frame = 1;
         enemy->enemyType = enemyType;
         break;
     case 2:
         break;
     default:
-        enemy->sprite = gf2d_sprite_load_all("images/pirateship.png",178,214,4,1);
-        enemy->frame = 5;
         break;
     }
+    //enemy->think = enemy_think;
+    //enemy->update = enemy_update;
     enemy->isEnemy = 1;
     enemy->position = enemyPosition;
-    enemy->health = 100;
     enemy->healthPool = enemy->health;
     enemy->hasAttacked = 0;
     enemy->isAlive = 1;
+    enemy->spawnPoint = enemyPosition;
     
     enemy->bounds.r = 16;
     enemy->bounds.x = enemyPosition.x;
@@ -97,7 +102,7 @@ void enemy_update(Entity *self)
         if(self->frame >= 8)self->frame = 5;
         break;
     case 1:
-        self->frame += 0.01;
+        self->frame += 0.1;
         if(self->frame >= 10)self->frame = 1;
         break;
     case 2:
@@ -108,16 +113,18 @@ void enemy_update(Entity *self)
         break;
     }
 
-    if(self->health <= 0 && self->isAlive == 1)
-    {
-        self->isAlive = 0;
-        enemy_die(self);
-    }
     if(player->player->hasAttacked)
     {
         enemy_attack(player->player);
         self->hasAttacked = 1;
     }
+
+    if(self->health <= 0 && self->isAlive == 1)
+    {
+        self->isAlive = 0;
+        enemy_die(self);
+    }
+
 }
 
 void enemy_die(Entity *self)
@@ -130,8 +137,15 @@ void enemy_die(Entity *self)
 
     if(!player)return;
 
+    if(player->inTown)
+    {
+        
+    }
+
     player->gold += 10;
+    player->inExploration = 1;
     player->inCombat = 0;
+    player->resetPositions = 1;
     player->movementBudget_x += 512;
     player->movementBudget_y += 512;
     enemy_free(self);

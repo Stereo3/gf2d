@@ -1,6 +1,8 @@
 #include "simple_logger.h"
 #include "player.h"
 #include "camera.h"
+#include <SDL_mixer.h>
+#include "gfc_audio.h"
 
 Entity *collisionPartner;
 
@@ -45,6 +47,7 @@ Player *player_new(const char *thePlayerName)
     player->healthPool = player->health;
     player->hasAttacked = 0;
     player->isAlive = 1;
+    player->spawnPoint = player->position;
 
     slog("The Players Chosen Name: %s \n", thePlayerName);
 
@@ -56,7 +59,12 @@ Player *player_new(const char *thePlayerName)
     thePlayer.inCombat = 0;
     thePlayer.movementEnabled = 1;
     thePlayer.inTown = 0;
+    thePlayer.inExploration = 1;
     thePlayer.chosenDialougeOption = 0;
+    thePlayer.resetPositions = 0;
+    gfc_line_sprintf(thePlayer.quest1, "Sink the ship you saw at the start of yer journey!");
+    gfc_line_sprintf(thePlayer.quest2, "Explore the ruins, and defeat yer nemesis!");
+
 
     //slog("Player Bounds Values: X:%f Y:%f R:%f", thePlayer.player->bounds.x,thePlayer.player->bounds.y,thePlayer.player->bounds.r);
 
@@ -65,7 +73,10 @@ Player *player_new(const char *thePlayerName)
 
 void player_attack(Entity *target)
 {
+    Sound *hitsound;
+    hitsound = gfc_sound_load("sfx/cannon.mp3",1,2);
     //slog("Smack");
+    gfc_sound_play(hitsound,0,.25,-1,-1);
     target->health -= rng_machine(1,15,1);
     thePlayer.player->hasAttacked = 1;
     //slog("Enemy health: %i", target->health);
@@ -88,8 +99,15 @@ void player_talk_to_npc(Player *self, Entity *npcToTalkTo)
                 case SDLK_2:
                     self->chosenDialougeOption = 2;
                     break;
-                default:
-                    self->chosenDialougeOption = 0;
+                case SDLK_3:
+                    self->chosenDialougeOption = 3;
+                    break;
+                case SDLK_4:
+                    self->chosenDialougeOption = 4;
+                    break;
+                case SDLK_5:
+                    self->chosenDialougeOption = 5;
+                    break;
             }
             break;
     }
@@ -140,6 +158,7 @@ void player_think(Player *self)
                 case SDLK_k:
                     self->movementBudget_x = 128;
                     self->movementBudget_y = 128;
+                    //self->player->health = 0;
                     break;
             }
             break;
@@ -197,22 +216,41 @@ void player_think(Player *self)
     {
         if(collisionPartner->isEnemy == 1)
         {
-            self->movementEnabled = 0;
-            vector2d_copy(self->lastLocation, self->player->position);
-            //slog("1 Enemey Position: X:%f | Y:%f", collisionPartner->position.x, collisionPartner->position.y);
-            self->player->position = vector2d(256,150);
-            collisionPartner->position = vector2d(600,150);
-            self->enemyInCombatWith = collisionPartner;
-            self->inCombat = 1;
-            player_swap_sprite(self, 1);
+            switch (collisionPartner->enemyType)
+            {
+            case 0:
+                self->inExploration = 0;
+                self->movementEnabled = 0;
+                vector2d_copy(self->lastLocation, self->player->position);
+                //slog("1 Enemey Position: X:%f | Y:%f", collisionPartner->position.x, collisionPartner->position.y);
+                self->player->position = vector2d(256,150);
+                collisionPartner->position = vector2d(600,150);
+                self->enemyInCombatWith = collisionPartner;
+                self->inCombat = 1;
+                player_swap_sprite(self, 1);
+                break;
+            case 1:
+                self->inExploration = 0;
+                self->movementEnabled = 0;
+                vector2d_copy(self->lastLocation, self->player->position);
+                self->player->position = vector2d(400,300);
+                collisionPartner->position = vector2d(700,300);
+                self->enemyInCombatWith = collisionPartner;
+                self->inCombat = 1;
+                break;
+            default:
+                break;
+            }
         }
         else if(collisionPartner->isTown == 1)
         {
+            self->inExploration = 0;
             self->lastTownVisited = collisionPartner;
             vector2d_copy(self->lastLocation, self->player->position);
-            self->lastLocation.x -= 10;
+            self->lastLocation.x -= 16;
+            self->lastLocation.y -= 16;
             self->player->position = vector2d(64,300);
-            collisionPartner->position = vector2d(-10,-10);
+            collisionPartner->position = vector2d(-1000,-1000);
             self->inTown = 1;
         }
         else if(collisionPartner->isNpc == 1)
@@ -227,9 +265,10 @@ void player_think(Player *self)
     {
         if(keys[SDL_SCANCODE_L])
         {
+            self->inExploration = 1;
+            self->resetPositions = 1;
             vector2d_copy(self->player->position, self->lastLocation);
             self->lastTownVisited->position = self->lastTownVisited->lastPosition;
-            self->npcBeingTalkedTo->hidden = 1;
             self->inTown = 0;
             self->talkingToNpc = 0;
             self->movementBudget_x = 512;

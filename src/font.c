@@ -179,13 +179,13 @@ void font_draw_text(const char *text,FontStyles style, Color color,Vector2D posi
     surface = TTF_RenderUTF8_Blended_Wrapped(font,text, fg, 0);
     if (!surface)
     {
-        slog("the error");
+        //slog("the error");
         return;
     }
     surface = gf2d_graphics_screen_convert(&surface);
     if (!surface)
     {
-        slog("the error");
+        //slog("the error");
         return;
     }
     texture = SDL_CreateTextureFromSurface(gf2d_graphics_get_renderer(),surface);

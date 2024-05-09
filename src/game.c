@@ -23,24 +23,35 @@ int main(int argc, char * argv[])
     int done = 0;
     const Uint8 * keys;
     World *world;
-    World *combat;
+    World *combat, *combatPirate;
     World *town_w_1, *town_w_2;
+    World *jungle_w_1, *ruins_w_1, *desert_w_1;
     Uint8 mainMenuBool = 1;
     Sprite *mainMenuImg;
     SJson *json, *saver;
     Sound *ambiance;
-    
+
+    Vector2D town1Spawnpoint, town2Spawnpoint, jungle1Spawnpoint,
+    ruins1Spawnpoint, desert1Spawnpoint, ship1Spawnpoint, pirate1Spawnpoint, offscreen;    
+
     int mx,my;
     float mf = 0;
     Sprite *mouse;
     Color mouseColor = gfc_color8(255,100,255,200);
+
     Player *player;
-    Entity *pirateShip1;
-    Entity *town1, *town2;
+
+    Entity *pirateShip1, *pirate1;
+
+    Entity *town1, *town2, *jungle1, *ruins1, *desert1;
+
     Entity *npc1;
+
+    Entity *goldenIdol;
+
     TextLine fps, player_pos, movementBudgets, combatStatus, 
     enemyHealth, playerHealth, npcDialouge, playerDialougeOption1, playerDialougeOption2,
-    townStatus;
+    townStatus, questText1, questText2;
 
     
     /*program initializtion*/
@@ -69,20 +80,44 @@ int main(int argc, char * argv[])
         return NULL;
     }
 
+    offscreen = vector2d(-1000,-1000);
+    town1Spawnpoint = vector2d(832,288);
+    town2Spawnpoint = vector2d(1408,688);
+    jungle1Spawnpoint = vector2d(96,768);
+    ruins1Spawnpoint = vector2d(1536,64);
+    desert1Spawnpoint = vector2d(832,768);
+    ship1Spawnpoint = vector2d(320,320);
+    pirate1Spawnpoint = vector2d(640,640);
 
     /*demo setup*/
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
+
     player = player_new("greg");
+
     world = world_load("maps/testworld.map");
     combat = world_load("maps/combat.map");
+    combatPirate = world_load("maps/combatPirate.map");
     town_w_1 = world_load("maps/town.map");
     town_w_2 = world_load("maps/town2.map");
-    pirateShip1 = enemy_new(vector2d(320,320), 0);
+    jungle_w_1 = world_load("maps/jungle1.map");
+    ruins_w_1 = world_load("maps/ruins1.map");
+    desert_w_1 = world_load("maps/desert1.map");
+
+    pirateShip1 = enemy_new(ship1Spawnpoint, 0);
+    pirate1 = enemy_new(offscreen, 1);
     //TEST = enemy_new(vector2d(320,520), 2);
-    town1 = town_new(vector2d(832,272), "firstville");
-    town2 = town_new(vector2d(1408,688),"secondale");
-    npc1 = npc_new(vector2d(-1000,-1000), 1);
-    player->npcBeingTalkedTo = npc1;
+
+    town1 = town_new(town1Spawnpoint, "firstville");
+    town2 = town_new(town2Spawnpoint,"secondale");
+    jungle1 = town_new(jungle1Spawnpoint, "jungle1");
+    ruins1 = town_new(ruins1Spawnpoint,"ruins1");
+    desert1 = town_new(desert1Spawnpoint,"desert1");
+
+    npc1 = npc_new(offscreen, 0);
+
+    goldenIdol = entity_new();
+    //player->npcBeingTalkedTo = npc1;
+
     mainMenuImg = gf2d_sprite_load_all("images/mainmenu.png",125,300,1,0);
     world_setup_camera(world);
     ambiance = gfc_sound_load("music/bgm.mp3", 1,1);
@@ -106,7 +141,6 @@ int main(int argc, char * argv[])
         
         if(mainMenuBool == 1)
         {
-            
             if(!mainMenuImg)
             {
                 slog("No Main Menu for you!");
@@ -135,18 +169,46 @@ int main(int argc, char * argv[])
             player_update(player);
             enemy_think(pirateShip1);
             enemy_update(pirateShip1);
+            enemy_think(pirate1);
+            enemy_update(pirate1);
             npc_think(npc1);
             
             gf2d_graphics_clear_screen();// clears drawing buffers
             // all drawing should happen betweem clear_screen and next_frame
                 //backgrounds drawn first            
-                if(player->inCombat == 1)
+                if(player->inExploration == 1)
                 {
-                    world_draw(combat);
-                    gfc_line_sprintf(enemyHealth,"%i/%i",player->enemyInCombatWith->health,player->enemyInCombatWith->healthPool);
-                    font_draw_text(enemyHealth,FS_large,GFC_COLOR_RED,vector2d(625,350));
-                    gfc_line_sprintf(playerHealth,"%i/%i",player->player->health,player->player->healthPool);
-                    font_draw_text(playerHealth,FS_large,GFC_COLOR_GREEN,vector2d(275,350));
+                    if(player->resetPositions == 1)
+                    {
+                        entity_reset_all(NULL);
+                        player->resetPositions = 0;
+                    }
+                    world_draw(world);
+                    entity_unhide_all(npc1);
+                }
+                else if(player->inCombat == 1)
+                {
+                    switch (player->enemyInCombatWith->enemyType)
+                    {
+                    case 0:
+                        world_draw(combat);
+                        entity_hide_all(player->enemyInCombatWith);
+                        gfc_line_sprintf(enemyHealth,"%i/%i",player->enemyInCombatWith->health,player->enemyInCombatWith->healthPool);
+                        font_draw_text(enemyHealth,FS_large,GFC_COLOR_RED,vector2d(625,350));
+                        gfc_line_sprintf(playerHealth,"%i/%i",player->player->health,player->player->healthPool);
+                        font_draw_text(playerHealth,FS_large,GFC_COLOR_GREEN,vector2d(275,350));
+                        break;
+                    case 1:
+                        world_draw(combatPirate);
+                        entity_hide_all(player->enemyInCombatWith);
+                        gfc_line_sprintf(enemyHealth,"%i/%i",player->enemyInCombatWith->health,player->enemyInCombatWith->healthPool);
+                        font_draw_text(enemyHealth,FS_large,GFC_COLOR_RED,vector2d(675,375));
+                        gfc_line_sprintf(playerHealth,"%i/%i",player->player->health,player->player->healthPool);
+                        font_draw_text(playerHealth,FS_large,GFC_COLOR_GREEN,vector2d(375,375));
+                        break;
+                    default:
+                        break;
+                    }
                 }
                 else if(player->inTown == 1)
                 {
@@ -154,17 +216,67 @@ int main(int argc, char * argv[])
                     {
                     //slog("Town? : %i", player->inTown);
                         npc1->position = vector2d(512,350);
-                        town2->position = vector2d(-1000,-1000);
-                        player->npcBeingTalkedTo->hidden = 0;
+                        npc1->hidden = 0;
+                        town2->position = offscreen;
+                        jungle1->position = offscreen;
+                        ruins1->position = offscreen;
+                        desert1->position = offscreen;
+                        
+                        if(!pirateShip1)
+                        {
+                            slog("pirateShip1 is dead");
+                        }
+                        else
+                        {
+                            pirateShip1->position = offscreen;
+                        }
+
+                        if(!pirate1)
+                        {
+                            slog("pirate1 is dead");
+                        }
+                        else
+                        {
+                            pirate1->position = offscreen;
+                        }
+            
                         world_draw(town_w_1);
                         player->movementBudget_x = 100000;
                         player->movementBudget_y = 100000;
                         if(player->talkingToNpc == 1)
                         {
-                            gfc_line_sprintf(playerDialougeOption1, "1. Hey there... Steve?");
+                            switch (player->chosenDialougeOption)
+                            {
+                            case 0:
+                                gfc_line_sprintf(playerDialougeOption1, "1. Hey there... Steve?");
+                                gfc_line_sprintf(playerDialougeOption2, "2. Skibidi rizz in Ohio, snarkle steez swag god the toilet.");
+                                break;
+                            case 1:
+                                gfc_line_sprintf(playerDialougeOption1, "3. Got anything for me to do?");
+                                gfc_line_sprintf(playerDialougeOption2, "");
+                                break;
+                            case 2:
+                                gfc_line_sprintf(playerDialougeOption1, "");
+                                gfc_line_sprintf(playerDialougeOption2, "");
+                                break;
+                            case 3:
+                                gfc_line_sprintf(playerDialougeOption1, "4. ...Ok can you tell me?");
+                                gfc_line_sprintf(playerDialougeOption2, "5. I'm leaving now.");
+                                break;
+                            case 4:
+                                gfc_line_sprintf(player->quest3, "Find the golden Idol");
+                                gfc_line_sprintf(playerDialougeOption1, "5. Bye now.");
+                                gfc_line_sprintf(playerDialougeOption2, "");
+                                break;
+                            default:
+                                gfc_line_sprintf(playerDialougeOption1, "1. Hey again Steve");
+                                gfc_line_sprintf(playerDialougeOption2, "2. Skibidi rizz in Ohio, snarkle steez swag god the toilet.");
+                                break;
+                            }
+                            
                             font_draw_text(playerDialougeOption1, FS_large,GFC_COLOR_GREEN,vector2d(0,35));
-                            gfc_line_sprintf(playerDialougeOption2, "2. Skibidi rizz in Ohio, snarkle steez swag god the toilet.");
                             font_draw_text(playerDialougeOption2, FS_large,GFC_COLOR_RED,vector2d(0,80));
+
                             
                             if(npc1->beingTalkedTo == 1)
                             {
@@ -176,7 +288,112 @@ int main(int argc, char * argv[])
                     }
                     else if(gfc_stricmp(player->lastTownVisited->entityName, "secondale") == 0)
                     {
+                        if(!pirateShip1)
+                        {
+                            slog("pirateShip1 is dead");
+                        }
+                        else
+                        {
+                            pirateShip1->position = offscreen;
+                        }
+
+                        if(!pirate1)
+                        {
+                            slog("pirate1 is dead");
+                        }
+                        else
+                        {
+                            pirate1->position = offscreen;
+                        }
+                        npc1->position = offscreen;
+                        town1->position = offscreen;
+                        jungle1->position = offscreen;
+                        ruins1->position = offscreen;
+                        desert1->position = offscreen;
                         world_draw(town_w_2);
+                        player->movementBudget_x = 100000;
+                        player->movementBudget_y = 100000;
+                    }
+                    else if(gfc_stricmp(player->lastTownVisited->entityName, "jungle1") == 0)
+                    {
+                        if(!pirateShip1)
+                        {
+                            slog("pirateShip1 is dead");
+                        }
+                        else
+                        {
+                            pirateShip1->position = offscreen;
+                        }
+
+                        if(!pirate1)
+                        {
+                            slog("pirate1 is dead");
+                        }
+                        else
+                        {
+                            pirate1->position = offscreen;
+                        }
+                        npc1->position = offscreen;
+                        town1->position = offscreen;
+                        town2->position = offscreen;
+                        ruins1->position = offscreen;
+                        desert1->position = offscreen;
+                        world_draw(jungle_w_1);
+                        player->movementBudget_x = 100000;
+                        player->movementBudget_y = 100000;
+                    }
+                    else if(gfc_stricmp(player->lastTownVisited->entityName, "ruins1") == 0)
+                    {
+                        if(!pirateShip1)
+                        {
+                            slog("pirateShip1 is dead");
+                        }
+                        else
+                        {
+                            pirateShip1->position = offscreen;
+                        }
+
+                        if(!pirate1)
+                        {
+                            slog("pirate1 is dead");
+                        }
+                        else
+                        {
+                            pirate1->position = pirate1Spawnpoint;
+                        }
+                        npc1->position = offscreen;
+                        town1->position = offscreen;
+                        town2->position = offscreen;
+                        jungle1->position = offscreen;
+                        world_draw(ruins_w_1);
+                        player->movementBudget_x = 100000;
+                        player->movementBudget_y = 100000;
+                    }
+                    else if(gfc_stricmp(player->lastTownVisited->entityName, "desert1") == 0)
+                    {
+                        if(!pirateShip1)
+                        {
+                            slog("pirateShip1 is dead");
+                        }
+                        else
+                        {
+                            pirateShip1->position = offscreen;
+                        }
+
+                        if(!pirate1)
+                        {
+                            slog("pirate1 is dead");
+                        }
+                        else
+                        {
+                            pirate1->position = offscreen;
+                        }
+                        npc1->position = offscreen;
+                        town1->position = offscreen;
+                        town2->position = offscreen;
+                        jungle1->position = offscreen;
+                        ruins1->position = offscreen;
+                        world_draw(desert_w_1);
                         player->movementBudget_x = 100000;
                         player->movementBudget_y = 100000;
                     }
@@ -187,7 +404,8 @@ int main(int argc, char * argv[])
                 }
                 else
                 {
-                    world_draw(world);
+                    player->player->health = 0;
+                    //world_draw(world);
                 }
                 //slog("Player in Combat: %i", player->inCombat);
             
@@ -207,6 +425,15 @@ int main(int argc, char * argv[])
                     gfc_line_sprintf(townStatus,"Town Status: %i",player->inTown);
                     font_draw_text(townStatus,FS_small,GFC_COLOR_ORANGE,vector2d(10,130));
 
+                    gfc_line_sprintf(questText1,"Quests");
+                    font_draw_text(questText1,FS_small, GFC_COLOR_YELLOW,vector2d(900,10));
+                    gfc_line_sprintf(questText1,"------------------");
+                    font_draw_text(questText1,FS_small, GFC_COLOR_YELLOW,vector2d(850,30));
+                    font_draw_text(player->quest1,FS_small, GFC_COLOR_YELLOW,vector2d(700,60));
+                    font_draw_text(player->quest2,FS_small, GFC_COLOR_YELLOW,vector2d(725,90));
+                    font_draw_text(player->quest3,FS_small, GFC_COLOR_YELLOW,vector2d(825,120));
+
+
                 }
                 
                 //UI elements last
@@ -223,7 +450,16 @@ int main(int argc, char * argv[])
             gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
         }
         
-        if(player->player->health <= 0)done = 1;
+        if(player->player->health <= 0)
+        {
+            player->player->position = player->player->spawnPoint;
+            player->resetPositions = 1;
+            player->inExploration = 1;
+            player->inCombat = 0;
+            player->player->position = vector2d(64,64);
+            player->player->health += 100;
+            mainMenuBool = 1;
+        }
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }

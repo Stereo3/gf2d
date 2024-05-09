@@ -31,6 +31,41 @@ void entity_clear_all(Entity *ignore)
     //free(entity_manager.entity_list);
 }
 
+void entity_hide_all(Entity *ignore)
+{
+    int i;
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if(&entity_manager.entity_list[i] == ignore)continue;
+        if(!entity_manager.entity_list[i]._inuse)continue;
+        if(entity_manager.entity_list[i].isPlayer)continue;
+        entity_manager.entity_list[i].hidden = 1;     
+    }
+}
+
+void entity_reset_all(Entity *ignore)
+{
+    int i;
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if(&entity_manager.entity_list[i] == ignore)continue;
+        if(!entity_manager.entity_list[i]._inuse)continue;
+        if(entity_manager.entity_list[i].isPlayer)continue;
+        entity_manager.entity_list[i].position = entity_manager.entity_list[i].spawnPoint;     
+    }
+}
+
+void entity_unhide_all(Entity *ignore)
+{
+    int i;
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if(&entity_manager.entity_list[i] == ignore)continue;
+        if(!entity_manager.entity_list[i]._inuse)continue;
+        entity_manager.entity_list[i].hidden = 0;     
+    }
+}
+
 void entity_system_init(Uint32 maxEntities)
 {
     if(entity_manager.entity_list)

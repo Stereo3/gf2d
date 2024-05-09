@@ -5,7 +5,8 @@
 
 typedef struct Player_S
 {
-    Uint8 exsits, inCombat, movementEnabled, shipMode, inTown, talkingToNpc;
+    Uint8 exsits, inCombat, movementEnabled, shipMode, inTown, talkingToNpc,
+    inExploration, resetPositions;
     Uint8 chosenDialougeOption;
     Entity *player;
     Entity *enemyInCombatWith;
@@ -14,6 +15,7 @@ typedef struct Player_S
     const char *playerName;
     float playerSpeed, movementBudget_x, movementBudget_y;
     Vector2D lastLocation;
+    TextLine quest1, quest2, quest3;
     int gold;
 }Player;
 

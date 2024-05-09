@@ -6,6 +6,7 @@
 #include "entity.h"
 #include "player.h"
 
+
 void npc_think(Entity *self);
 void npc_update(Entity *self);
 void npc_free(Entity *self);

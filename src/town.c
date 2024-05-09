@@ -14,6 +14,7 @@ Entity *town_new(Vector2D townPosition, const char * townName)
 
     town->position = townPosition;
     town->lastPosition = townPosition;
+    town->spawnPoint = townPosition;
 
     town->bounds.x = townPosition.x;
     town->bounds.y = townPosition.y;

@@ -8,8 +8,7 @@
 
 //static float enemySpeed, movementBudget_x, movementBudget_y;
 
-void enemy_think(Entity *self);
-void enemy_update(Entity *self);
+
 void enemy_free(Entity *self);
 void enemy_die(Entity *self);
 Vector2D get_enemy_position(Entity *self);

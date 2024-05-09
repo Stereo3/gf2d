@@ -17,14 +17,15 @@ typedef struct Entity_S
     Sprite *sprite;
     Uint8 hidden;
     Uint8 selected;
-    Uint8 isPlayer, isEnemy, isTown, isNpc, PLACEHOLDER;
+    Uint8 isPlayer, isEnemy, isTown, isNpc;
     Uint8 hasAttacked;
     Uint8 beingTalkedTo;
     float frame;
     Circle bounds;
     Uint32 enemyType;
+    Uint8 lastDialougeOption;
 
-    Vector2D position, lastPosition;
+    Vector2D position, lastPosition, spawnPoint;
     
     const char *entityName;
     const char *sayTheLine;
@@ -107,6 +108,12 @@ Entity *entity_get_collision_partner(Entity *self);
 Uint8 bad_collision_check(Entity *self, Entity *other);
 
 int rng_machine(int lower, int upper, int count); 
+
+void entity_hide_all(Entity *ignore);
+
+void entity_unhide_all(Entity *ignore);
+
+void entity_reset_all(Entity *ignore);
 
 //void update_enemy_positions();
 
